@@ -1,0 +1,9 @@
+DPC_Miscellaneous.c:72:25:DPC_MISC_Check_DCLoad	32	static
+DPC_Miscellaneous.c:144:6:DPC_MISC_DCLoad_Init	64	static
+DPC_Miscellaneous.c:203:6:DPC_MISC_ACSource_Init	48	static
+DPC_Miscellaneous.c:270:6:DPC_MISC_APPL_Timer_Init	24	static
+DPC_Miscellaneous.c:291:6:DPC_MISC_Appl_Timer_Start	8	static
+DPC_Miscellaneous.c:369:6:DPC_MISC_BLED_Set	24	static
+DPC_Miscellaneous.c:420:34:DPC_MISC_AC_SOURCE_Plugged	24	static
+DPC_Miscellaneous.c:456:27:DPC_MISC_CHECK_AC_SOURCE	56	static
+DPC_Miscellaneous.c:617:8:DPC_DAC_Init	16	static

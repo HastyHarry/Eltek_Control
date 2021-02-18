@@ -1,0 +1,5 @@
+DPC_Math.c:64:7:FastSin	24	static
+DPC_Math.c:86:7:FastCos	16	static
+DPC_Math.c:102:7:Integral	16	static
+DPC_Math.c:123:6:InitINTEGRATOR	24	static
+DPC_Math.c:141:6:INTEGRATOR_RESET	16	static

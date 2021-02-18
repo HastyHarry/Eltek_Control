@@ -1,0 +1,11 @@
+DPC_FSM.c:51:6:DPC_FSM_Application	8	static
+DPC_FSM.c:131:13:DPC_FSM_WAIT_Func	16	static
+DPC_FSM.c:145:13:DPC_FSM_IDLE_Func	16	static
+DPC_FSM.c:159:13:DPC_FSM_INIT_Func	16	static
+DPC_FSM.c:173:13:DPC_FSM_START_Func	16	static
+DPC_FSM.c:188:13:DPC_FSM_RUN_Func	16	static
+DPC_FSM.c:203:13:DPC_FSM_STOP_Func	16	static
+DPC_FSM.c:217:13:DPC_FSM_ERROR_Func	16	static
+DPC_FSM.c:229:13:DPC_FSM_FAULT_Func	16	static
+DPC_FSM.c:241:17:DPC_FSM_State_Get	4	static
+DPC_FSM.c:252:6:DPC_FSM_State_Set	16	static

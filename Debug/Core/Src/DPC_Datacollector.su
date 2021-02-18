@@ -1,0 +1,15 @@
+DPC_Datacollector.c:67:23:DATA_Vabc_Read	4	static
+DPC_Datacollector.c:81:6:DATA_Write_Theta_PLL	16	static
+DPC_Datacollector.c:96:7:DATA_Read_Theta_PLL	4	static
+DPC_Datacollector.c:111:6:DATA_CURR_Write_ClarkePark	24	static
+DPC_Datacollector.c:129:6:DATA_VOLT_Write_ClarkePark	24	static
+DPC_Datacollector.c:147:17:DATA_CURR_Read_ClarkePark	40	static
+DPC_Datacollector.c:161:17:DATA_VOLT_Read_ClarkePark	40	static
+DPC_Datacollector.c:177:6:InitDMA_ADC_CONV	8	static
+DPC_Datacollector.c:191:16:DATA_Read_ADC_Raw	4	static
+DPC_Datacollector.c:209:6:DATA_Acquisition_from_DMA	16	static
+DPC_Datacollector.c:283:6:DATA_Acquisition_from_LUT	16	static
+DPC_Datacollector.c:312:23:Read_GRID	4	static
+DPC_Datacollector.c:326:23:Read_Curr_GRID	4	static
+DPC_Datacollector.c:340:23:Read_Curr_DC	4	static
+DPC_Datacollector.c:352:23:Read_Volt_DC	4	static

@@ -1,0 +1,4 @@
+DPC_PLL.c:82:6:DPC_PLL_Init	48	static
+DPC_PLL.c:116:6:PLLabc	88	static
+DPC_PLL.c:201:6:PLLabc_opt	80	static
+DPC_PLL.c:286:20:DPC_PLL_pllqd_Run	88	static

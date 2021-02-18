@@ -1,0 +1,5 @@
+DPC_LUT.c:55:6:DPC_LUT_Gen	40	static
+DPC_LUT.c:111:6:DPC_LUT_Gen_opt	40	static
+DPC_LUT.c:172:6:DPC_LUT_Init	32	static
+DPC_LUT.c:194:6:Ramp_Generator	16	static
+DPC_LUT.c:226:6:Ramp_ThreePhGen	24	static

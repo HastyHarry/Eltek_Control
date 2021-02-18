@@ -1,0 +1,13 @@
+DPC_Loopctrl.c:64:6:Current_Decoupling_Control	72	static
+DPC_Loopctrl.c:141:6:FeedForward_Control	40	static
+DPC_Loopctrl.c:168:6:Voltage_Control	32	static
+DPC_Loopctrl.c:189:6:DPC_LPCNTRL_PFC_Mode_Reset	16	static
+DPC_Loopctrl.c:211:6:DPC_LPCNTRL_PFC_Mode	48	static
+DPC_Loopctrl.c:311:6:DPC_LPCNTRL_BURST_Init	56	static
+DPC_Loopctrl.c:355:21:DPC_LPCNTRL_Burst_Check	32	static
+DPC_Loopctrl.c:412:6:DPC_LPCNTRL_Burst_Mode	40	static
+DPC_Loopctrl.c:490:22:DPC_LPCNTRL_Inrush_Check	40	static
+DPC_Loopctrl.c:550:6:DPC_LPCNTRL_Inrush_Init	40	static
+DPC_Loopctrl.c:593:6:DPC_LPCNTRL_CDC_Init	24	static
+DPC_Loopctrl.c:631:6:DPC_Relay_Init	16	static
+DPC_Loopctrl.c:650:6:DPC_LPCNTRL_PFC_Init	32	static

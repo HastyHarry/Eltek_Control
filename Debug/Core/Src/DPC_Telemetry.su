@@ -1,0 +1,17 @@
+DPC_Telemetry.c:96:10:TLM_CMD_Load	16	static
+DPC_Telemetry.c:217:6:TLS_SetParam	16	static
+DPC_Telemetry.c:233:6:TLM_Init	8	static
+DPC_Telemetry.c:244:9:TLM_Telemetry_FSM	16	static
+DPC_Telemetry.c:311:9:TLM_readyToSend	4	static
+DPC_Telemetry.c:323:9:TLM_readyToRead	4	static
+DPC_Telemetry.c:334:6:TLM_DataSended	4	static
+DPC_Telemetry.c:345:6:TLM_DataReaded	4	static
+DPC_Telemetry.c:358:9:CMD_Read	16	static
+DPC_Telemetry.c:398:9:CMD_Loop	16	static
+DPC_Telemetry.c:448:9:CMD_V_Loop	16	static
+DPC_Telemetry.c:503:9:CMD_I_Loop	16	static
+DPC_Telemetry.c:553:9:CMD_O_Loop	16	static
+DPC_Telemetry.c:599:14:TLM_NEWData	4	static
+DPC_Telemetry.c:610:6:TLM_Data_Connect	16	static
+DPC_Telemetry.c:622:9:Ch_To_EX	24	static
+DPC_Telemetry.c:689:6:ClearBufferRx	16	static
