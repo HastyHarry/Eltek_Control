@@ -7,3 +7,4 @@ DPC_adc_converter.c:151:6:ADC2Phy_Current_ProcessData	32	static
 DPC_adc_converter.c:173:6:ADC_Current_DC_ProcessData	16	static
 DPC_adc_converter.c:187:6:ADC2Phy_DC_Current_ProcessData	32	static
 DPC_adc_converter.c:208:6:DPC_ADC_Init	48	static
+DPC_adc_converter.c:233:6:DPC_ADC_Default_Init	80	static

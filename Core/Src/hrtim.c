@@ -126,8 +126,8 @@ void MX_HRTIM1_Init(void)
   }
   pTimerCfg.InterruptRequests = HRTIM_TIM_IT_NONE;
   pTimerCfg.DMARequests = HRTIM_TIM_DMA_RST;
-  pTimerCfg.DMASrcAddress = 0;
-  pTimerCfg.DMADstAddress = (uint32_t)&(hhrtim1.Instance->sTimerxRegs[0].CMP1xR);
+  pTimerCfg.DMASrcAddress = 0x00;
+  pTimerCfg.DMADstAddress = 0x00;
   pTimerCfg.DMASize = 0x1;
   pTimerCfg.HalfModeEnable = HRTIM_HALFMODE_DISABLED;
   pTimerCfg.InterleavedMode = HRTIM_INTERLEAVED_MODE_DISABLED;
@@ -151,14 +151,10 @@ void MX_HRTIM1_Init(void)
   {
     Error_Handler();
   }
-  pTimerCfg.DMASrcAddress = 0;
-  pTimerCfg.DMADstAddress = (uint32_t)&(hhrtim1.Instance->sTimerxRegs[1].CMP1xR);
   if (HAL_HRTIM_WaveformTimerConfig(&hhrtim1, HRTIM_TIMERINDEX_TIMER_B, &pTimerCfg) != HAL_OK)
   {
     Error_Handler();
   }
-  pTimerCfg.DMASrcAddress = 0;
-  pTimerCfg.DMADstAddress = (uint32_t)&(hhrtim1.Instance->sTimerxRegs[2].CMP1xR);
   if (HAL_HRTIM_WaveformTimerConfig(&hhrtim1, HRTIM_TIMERINDEX_TIMER_C, &pTimerCfg) != HAL_OK)
   {
     Error_Handler();
@@ -168,7 +164,7 @@ void MX_HRTIM1_Init(void)
   {
     Error_Handler();
   }
-  pCompareCfg.CompareValue = 0;
+  pCompareCfg.CompareValue = 5;
   if (HAL_HRTIM_WaveformCompareConfig(&hhrtim1, HRTIM_TIMERINDEX_TIMER_A, HRTIM_COMPAREUNIT_3, &pCompareCfg) != HAL_OK)
   {
     Error_Handler();

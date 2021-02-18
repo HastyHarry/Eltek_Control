@@ -207,23 +207,148 @@ void ADC2Phy_DC_Current_ProcessData(DPC_ADC_Conf_TypeDef *DPC_ADC_Conf,uint32_t*
 
 void DPC_ADC_Init(DPC_ADC_Conf_TypeDef *DPC_ADC_Conf,float G_Vac,float B_Vac,float G_Iac,float B_Iac,float G_Vdc,float B_Vdc,float G_Idc,float B_Idc){
   
-DPC_ADC_Conf->B_Vac=B_Vac;
-DPC_ADC_Conf->G_Vac=G_Vac;
-DPC_ADC_Conf->invG_Vac=(float)(1.0/G_Vac);
+	DPC_ADC_Default_Init();
 
-DPC_ADC_Conf->B_Vdc=B_Vdc;
-DPC_ADC_Conf->G_Vdc=G_Vdc;
-DPC_ADC_Conf->invG_Vdc=(float)(1.0/G_Vdc);
+	DPC_ADC_Conf->B_Vac=B_Vac;
+	DPC_ADC_Conf->G_Vac=G_Vac;
+	DPC_ADC_Conf->invG_Vac=(float)(1.0/G_Vac);
 
-DPC_ADC_Conf->B_Iac=B_Iac;
-DPC_ADC_Conf->G_Iac=G_Iac;
-DPC_ADC_Conf->invG_Iac=(float)(1.0/G_Iac);
+	DPC_ADC_Conf->B_Vdc=B_Vdc;
+	DPC_ADC_Conf->G_Vdc=G_Vdc;
+	DPC_ADC_Conf->invG_Vdc=(float)(1.0/G_Vdc);
 
-DPC_ADC_Conf->B_Idc=B_Idc;
-DPC_ADC_Conf->G_Idc=G_Idc;
-DPC_ADC_Conf->invG_Idc=(float)(1.0/G_Idc);
+	DPC_ADC_Conf->B_Iac=B_Iac;
+	DPC_ADC_Conf->G_Iac=G_Iac;
+	DPC_ADC_Conf->invG_Iac=(float)(1.0/G_Iac);
+
+	DPC_ADC_Conf->B_Idc=B_Idc;
+	DPC_ADC_Conf->G_Idc=G_Idc;
+	DPC_ADC_Conf->invG_Idc=(float)(1.0/G_Idc);
 
 
-DPC_ADC_Conf->DPC_ADC_Conf_Complete=SET;
+	DPC_ADC_Conf->DPC_ADC_Conf_Complete=SET;
   
+}
+
+void DPC_ADC_Default_Init(){
+
+	  ADC_MultiModeTypeDef multimode = {0};
+	  ADC_AnalogWDGConfTypeDef AnalogWDGConfig = {0};
+	  ADC_ChannelConfTypeDef sConfig = {0};
+
+	  /** Common config
+	  */
+	  hadc1.Instance = ADC1;
+	  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+	  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+	  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+	  hadc1.Init.GainCompensation = 0;
+	  hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
+	  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+	  hadc1.Init.LowPowerAutoWait = DISABLE;
+	  hadc1.Init.ContinuousConvMode = ENABLE;
+	  hadc1.Init.NbrOfConversion = 8;
+	  hadc1.Init.DiscontinuousConvMode = DISABLE;
+	  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+	  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+	  hadc1.Init.DMAContinuousRequests = ENABLE;
+	  hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+	  hadc1.Init.OversamplingMode = ENABLE;
+	  hadc1.Init.Oversampling.Ratio = ADC_OVERSAMPLING_RATIO_8;
+	  hadc1.Init.Oversampling.RightBitShift = ADC_RIGHTBITSHIFT_4;
+	  hadc1.Init.Oversampling.TriggeredMode = ADC_TRIGGEREDMODE_SINGLE_TRIGGER;
+	  hadc1.Init.Oversampling.OversamplingStopReset = ADC_REGOVERSAMPLING_CONTINUED_MODE;
+	  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /** Configure the ADC multi-mode
+	  */
+	  multimode.Mode = ADC_MODE_INDEPENDENT;
+	  if (HAL_ADCEx_MultiModeConfigChannel(&hadc1, &multimode) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /** Configure Analog WatchDog 1
+	  */
+	  AnalogWDGConfig.WatchdogNumber = ADC_ANALOGWATCHDOG_1;
+	  AnalogWDGConfig.WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REG;
+	  AnalogWDGConfig.Channel = ADC_CHANNEL_1;
+	  AnalogWDGConfig.ITMode = DISABLE;
+	  AnalogWDGConfig.HighThreshold = 0x0;
+	  AnalogWDGConfig.LowThreshold = 0x0;
+	  AnalogWDGConfig.FilteringConfig = ADC_AWD_FILTERING_NONE;
+	  if (HAL_ADC_AnalogWDGConfig(&hadc1, &AnalogWDGConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /** Configure Regular Channel
+	  */
+	  sConfig.Channel = ADC_CHANNEL_1;
+	  sConfig.Rank = ADC_REGULAR_RANK_1;
+	  sConfig.SamplingTime = ADC_SAMPLETIME_6CYCLES_5;
+	  sConfig.SingleDiff = ADC_SINGLE_ENDED;
+	  sConfig.OffsetNumber = ADC_OFFSET_NONE;
+	  sConfig.Offset = 0;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /** Configure Regular Channel
+	  */
+	  sConfig.Channel = ADC_CHANNEL_2;
+	  sConfig.Rank = ADC_REGULAR_RANK_2;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /** Configure Regular Channel
+	  */
+	  sConfig.Channel = ADC_CHANNEL_3;
+	  sConfig.Rank = ADC_REGULAR_RANK_3;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /** Configure Regular Channel
+	  */
+	  sConfig.Channel = ADC_CHANNEL_4;
+	  sConfig.Rank = ADC_REGULAR_RANK_4;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /** Configure Regular Channel
+	  */
+	  sConfig.Channel = ADC_CHANNEL_5;
+	  sConfig.Rank = ADC_REGULAR_RANK_5;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /** Configure Regular Channel
+	  */
+	  sConfig.Channel = ADC_CHANNEL_6;
+	  sConfig.Rank = ADC_REGULAR_RANK_6;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /** Configure Regular Channel
+	  */
+	  sConfig.Channel = ADC_CHANNEL_7;
+	  sConfig.Rank = ADC_REGULAR_RANK_7;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /** Configure Regular Channel
+	  */
+	  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR_ADC1;
+	  sConfig.Rank = ADC_REGULAR_RANK_8;
+	  sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+	  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
 }
