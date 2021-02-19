@@ -34,7 +34,7 @@ extern "C" {
 extern HRTIM_HandleTypeDef hhrtim1;
 
 /* USER CODE BEGIN Private defines */
-
+//#define USE_HAL_HRTIM_REGISTER_CALLBACKS 1
 /* USER CODE END Private defines */
 
 void MX_HRTIM1_Init(void);

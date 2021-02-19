@@ -71,6 +71,7 @@ typedef enum
   OK_SOURCE,                            /*!< */
   OVERVOLTAGE_SOURCE,                   /*!< */
   OVERCURRENT_SOURCE,                   /*!< */
+  FAULT,
 }DPC_Source_Status_TypeDef;
 
 /**

@@ -255,7 +255,7 @@ void DPC_ADC_Default_Init(){
 	  hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
 	  hadc1.Init.OversamplingMode = ENABLE;
 	  hadc1.Init.Oversampling.Ratio = ADC_OVERSAMPLING_RATIO_8;
-	  hadc1.Init.Oversampling.RightBitShift = ADC_RIGHTBITSHIFT_4;
+	  hadc1.Init.Oversampling.RightBitShift = ADC_RIGHTBITSHIFT_3;
 	  hadc1.Init.Oversampling.TriggeredMode = ADC_TRIGGEREDMODE_SINGLE_TRIGGER;
 	  hadc1.Init.Oversampling.OversamplingStopReset = ADC_REGOVERSAMPLING_CONTINUED_MODE;
 	  if (HAL_ADC_Init(&hadc1) != HAL_OK)

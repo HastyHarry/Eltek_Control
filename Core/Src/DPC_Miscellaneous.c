@@ -501,7 +501,7 @@ DPC_Source_Status_TypeDef DPC_MISC_CHECK_AC_SOURCE(DPC_Source_TypeDef  *AC_Sourc
   DATA_VAC = Read_GRID();                                                                               /*!< >*/
   DATA_IAC = Read_Curr_GRID();                                                                          /*!< >*/
   
-  
+  //if (Status_Source!=FAULT){
 	if((DATA_IAC->phA > I_ac_pos_Limit_local) || (DATA_IAC->phA < I_ac_neg_Limit_local))
 	{
 		Status_Source=OVERCURRENT_SOURCE;
@@ -513,7 +513,7 @@ DPC_Source_Status_TypeDef DPC_MISC_CHECK_AC_SOURCE(DPC_Source_TypeDef  *AC_Sourc
 		Status_Source=OVERCURRENT_SOURCE;
 		//DPC_FLT_Faulterror_Set(FAULT_OCS);
 	}
-  
+ // }
   
 //  if((DATA_VAC->phA > V_ac_pos_Limit_local) || (DATA_VAC->phA < V_ac_neg_Limit_local))
 //  {  
@@ -554,7 +554,8 @@ DPC_Source_Status_TypeDef DPC_MISC_CHECK_AC_SOURCE(DPC_Source_TypeDef  *AC_Sourc
       if((AC_Source_sub->V_ac_pk_pos_local == 0) || (AC_Source_sub->V_ac_pk_neg_local == 1<<12)){ 
         Status_Source=WAIT_SOURCE;
       }
-      else{
+      else if (Status_Source!=OVERCURRENT_SOURCE){
+      //else{
         if((AC_Source_sub->V_ac_pk_pos_local > V_ac_pos_Limit_local) && (AC_Source_sub->V_ac_pk_neg_local < V_ac_neg_Limit_local)){
           Status_Source=OVERVOLTAGE_SOURCE;
           DPC_FLT_Faulterror_Set(FAULT_OVS);

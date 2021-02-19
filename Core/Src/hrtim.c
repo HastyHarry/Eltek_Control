@@ -41,7 +41,7 @@ void MX_HRTIM1_Init(void)
   HRTIM_OutputCfgTypeDef pOutputCfg = {0};
 
   hhrtim1.Instance = HRTIM1;
-  hhrtim1.Init.HRTIMInterruptResquests = HRTIM_IT_NONE;
+  hhrtim1.Init.HRTIMInterruptResquests = HRTIM_IT_FLT1|HRTIM_IT_FLT3;
   hhrtim1.Init.SyncOptions = HRTIM_SYNCOPTION_NONE;
   if (HAL_HRTIM_Init(&hhrtim1) != HAL_OK)
   {
@@ -67,30 +67,20 @@ void MX_HRTIM1_Init(void)
   {
     Error_Handler();
   }
-  pFaultBlkCfg.Threshold = 0;
-  pFaultBlkCfg.ResetMode = HRTIM_FAULTCOUNTERRST_UNCONDITIONAL;
-  pFaultBlkCfg.BlankingSource = HRTIM_FAULTBLANKINGMODE_RSTALIGNED;
-  if (HAL_HRTIM_FaultCounterConfig(&hhrtim1, HRTIM_FAULT_1, &pFaultBlkCfg) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_HRTIM_FaultCounterConfig(&hhrtim1, HRTIM_FAULT_1, &pFaultBlkCfg) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_HRTIM_FaultBlankingConfigAndEnable(&hhrtim1, HRTIM_FAULT_1, &pFaultBlkCfg) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_HRTIM_FaultBlankingConfigAndEnable(&hhrtim1, HRTIM_FAULT_1, &pFaultBlkCfg) != HAL_OK)
-  {
-    Error_Handler();
-  }
+//  pFaultBlkCfg.Threshold = 0;
+//  pFaultBlkCfg.ResetMode = HRTIM_FAULTCOUNTERRST_UNCONDITIONAL;
+//  pFaultBlkCfg.BlankingSource = HRTIM_FAULTBLANKINGMODE_RSTALIGNED;
+//  if (HAL_HRTIM_FaultCounterConfig(&hhrtim1, HRTIM_FAULT_1, &pFaultBlkCfg) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+
+//  if (HAL_HRTIM_FaultBlankingConfigAndEnable(&hhrtim1, HRTIM_FAULT_1, &pFaultBlkCfg) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+
   HAL_HRTIM_FaultModeCtl(&hhrtim1, HRTIM_FAULT_1, HRTIM_FAULTMODECTL_ENABLED);
-  if (HAL_HRTIM_FaultCounterConfig(&hhrtim1, HRTIM_FAULT_3, &pFaultBlkCfg) != HAL_OK)
-  {
-    Error_Handler();
-  }
   if (HAL_HRTIM_FaultCounterConfig(&hhrtim1, HRTIM_FAULT_3, &pFaultBlkCfg) != HAL_OK)
   {
     Error_Handler();
@@ -110,7 +100,7 @@ void MX_HRTIM1_Init(void)
   HAL_HRTIM_FaultModeCtl(&hhrtim1, HRTIM_FAULT_3, HRTIM_FAULTMODECTL_ENABLED);
   pTimeBaseCfg.Period = 34000;
   pTimeBaseCfg.RepetitionCounter = 0x00;
-  pTimeBaseCfg.PrescalerRatio = HRTIM_PRESCALERRATIO_MUL2;
+  pTimeBaseCfg.PrescalerRatio = HRTIM_PRESCALERRATIO_MUL8;
   pTimeBaseCfg.Mode = HRTIM_MODE_CONTINUOUS;
   if (HAL_HRTIM_TimeBaseConfig(&hhrtim1, HRTIM_TIMERINDEX_TIMER_A, &pTimeBaseCfg) != HAL_OK)
   {
@@ -126,8 +116,8 @@ void MX_HRTIM1_Init(void)
   }
   pTimerCfg.InterruptRequests = HRTIM_TIM_IT_NONE;
   pTimerCfg.DMARequests = HRTIM_TIM_DMA_RST;
-  pTimerCfg.DMASrcAddress = 0x00;
-  pTimerCfg.DMADstAddress = 0x00;
+  pTimerCfg.DMASrcAddress = 0;
+  pTimerCfg.DMADstAddress = 0;
   pTimerCfg.DMASize = 0x1;
   pTimerCfg.HalfModeEnable = HRTIM_HALFMODE_DISABLED;
   pTimerCfg.InterleavedMode = HRTIM_INTERLEAVED_MODE_DISABLED;
@@ -344,6 +334,9 @@ void HAL_HRTIM_MspInit(HRTIM_HandleTypeDef* hrtimHandle)
 
     __HAL_LINKDMA(hrtimHandle,hdmaTimerC,hdma_hrtim1_c);
 
+    /* HRTIM1 interrupt Init */
+    HAL_NVIC_SetPriority(HRTIM1_FLT_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(HRTIM1_FLT_IRQn);
   /* USER CODE BEGIN HRTIM1_MspInit 1 */
 
   /* USER CODE END HRTIM1_MspInit 1 */
@@ -414,6 +407,9 @@ void HAL_HRTIM_MspDeInit(HRTIM_HandleTypeDef* hrtimHandle)
     HAL_DMA_DeInit(hrtimHandle->hdmaTimerA);
     HAL_DMA_DeInit(hrtimHandle->hdmaTimerB);
     HAL_DMA_DeInit(hrtimHandle->hdmaTimerC);
+
+    /* HRTIM1 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(HRTIM1_FLT_IRQn);
   /* USER CODE BEGIN HRTIM1_MspDeInit 1 */
 
   /* USER CODE END HRTIM1_MspDeInit 1 */

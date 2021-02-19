@@ -97,9 +97,16 @@ typedef enum
 
 typedef struct
 {
+	uint32_t phAA;
+	uint32_t phAB;
+	uint32_t phBA;
+	uint32_t phBB;
+	uint32_t phCA;
+	uint32_t phCB;
 	uint32_t phA;
 	uint32_t phB;
 	uint32_t phC;
+
 }DMA_PWMDUTY_STRUCT;
 
 

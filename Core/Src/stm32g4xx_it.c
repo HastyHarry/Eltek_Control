@@ -60,6 +60,7 @@ extern DMA_HandleTypeDef hdma_adc1;
 extern DMA_HandleTypeDef hdma_hrtim1_a;
 extern DMA_HandleTypeDef hdma_hrtim1_b;
 extern DMA_HandleTypeDef hdma_hrtim1_c;
+extern HRTIM_HandleTypeDef hhrtim1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim6;
@@ -301,6 +302,20 @@ void TIM6_DAC_IRQHandler(void)
   /* USER CODE BEGIN TIM6_DAC_IRQn 1 */
 
   /* USER CODE END TIM6_DAC_IRQn 1 */
+}
+
+/**
+  * @brief This function handles HRTIM fault global interrupt.
+  */
+void HRTIM1_FLT_IRQHandler(void)
+{
+  /* USER CODE BEGIN HRTIM1_FLT_IRQn 0 */
+
+  /* USER CODE END HRTIM1_FLT_IRQn 0 */
+  HAL_HRTIM_IRQHandler(&hhrtim1,HRTIM_TIMERINDEX_COMMON);
+  /* USER CODE BEGIN HRTIM1_FLT_IRQn 1 */
+
+  /* USER CODE END HRTIM1_FLT_IRQn 1 */
 }
 
 /**

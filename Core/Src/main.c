@@ -24,7 +24,6 @@
 #include "dma.h"
 #include "fmac.h"
 #include "hrtim.h"
-#include "hrtim.h"
 #include "rng.h"
 #include "tim.h"
 #include "gpio.h"
@@ -70,7 +69,7 @@ float Service_data[20][500];
 uint16_t Service_step;
 uint16_t Service_counter;
 uint32_t Prev_Saturation;
-uint32_t* Flag;
+uint32_t Flag;
 uint32_t Flag2;
 
 /*!FSM*/
@@ -363,7 +362,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		//DATA_CURR_Write_ClarkePark(Current_qdo_Phy);  // Current qdo in DATA layer
 
 		PC_State=FSM_Run;
-		//Status_Source=OK_SOURCE;
+		if (Status_Source!=OVERCURRENT_SOURCE) Status_Source=OK_SOURCE;
 		if (Status_Source==OK_SOURCE){
 			FSM_Run_State = Run_PFC_Mode;
 		}
@@ -409,9 +408,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		}
 		if (Service_step>=500){
 			Service_step=0;
-			if (Flag2==1){
-				Service_step=0;
-			}
+//			if (Flag2==1){
+//				Service_step=0;
+//			}
 
 		}
 //		if (DMA_HRTIM_SRC[0]!=0){
@@ -420,13 +419,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 
 //		Prev_Saturation = DMA_HRTIM_SRC[0];
-		Flag= Read_GRID();
+		Flag = __HAL_HRTIM_GET_FLAG(&hhrtim1,HRTIM_FLAG_FLT1);
 
-		VOLTAGE_ADC_AC_IN_BITS.phA = (float)(Flag[0]);
-		Service_data[0][Service_step] = VOLTAGE_ADC_AC_IN_BITS.phA;
-//		Service_data[1][Service_step] = CURRENT_ADC_AC_IN_NORM.phA;
+//		VOLTAGE_ADC_AC_IN_BITS.phA = (float)(Flag[0]);
+		Service_data[0][Service_step] = DMA_HRTIM_SRC.phA;
+		Service_data[1][Service_step] = DMA_HRTIM_SRC.phAB;
 //		Service_data[2][Service_step] = V_DQO_CTRL.axd;
 //		Service_data[3][Service_step] = DMA_HRTIM_SRC[0];
+
 		//Service_data[4][Service_step]=__HAL_HRTIM_GETCOMPARE(&PWM_Tim1,HRTIM_TIMERINDEX_TIMER_A,HRTIM_COMPAREUNIT_1);
 		Service_step++;
 	}
@@ -477,13 +477,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	DATA_Write_Theta_PLL(PLL_CONVERTER.pll_theta_out_2pi);                                              ///Pass Theta to DATA LAYER
 
 
-	if (VOLTAGE_ADC_DC_IN_PHY.Vdc_tot>=350){
+	if (VOLTAGE_ADC_DC_IN_PHY.Vdc_tot>=30){
 		HAL_GPIO_WritePin(GPIOA, Relay_Pin, GPIO_PIN_SET);
 	}
 	else{
 		HAL_GPIO_WritePin(GPIOA, Relay_Pin, GPIO_PIN_RESET);
 	}
 	}
+}
+
+void HAL_HRTIM_Fault1Callback(HRTIM_HandleTypeDef *hhrtim){
+	Status_Source=OVERCURRENT_SOURCE;
+}
+void HAL_HRTIM_Fault3Callback(HRTIM_HandleTypeDef *hhrtim){
+	Status_Source=OVERCURRENT_SOURCE;
 }
 
 /* USER CODE END 4 */

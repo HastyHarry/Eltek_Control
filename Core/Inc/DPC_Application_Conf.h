@@ -79,7 +79,7 @@
 #define DPC_AC_3W                                                                       /*!< 3-WIRE AC Main Connection */
 //#define DPC_AC_4W                                                                       /*!< 4-WIRE AC Main Connection */
 ///DC OUTPUT  DEFINE of STDES-PFCBIDIR
-#define DPC_PFC_VDC_OUT                 120//720                                             /*!< DPC - DC Outout Voltage referance value of the Power converetr [Expresed in Volt]*/
+#define DPC_PFC_VDC_OUT                 150//720                                             /*!< DPC - DC Outout Voltage referance value of the Power converetr [Expresed in Volt]*/
 ///PROTECTION
 #define DPC_VAC_RMS_OV                  250                                             /*!< Over Voltage Limit AC main RMS Value [Expressed in Volts]*/
 #define DPC_VAC_RMS_UVLO                30//150                                             /*!< [Under Voltage Lock Out RMS Value [Expressed in Volts]*/
@@ -130,7 +130,7 @@
 #define DPC_VAC_PK_UVLO                 (uint16_t)((float)DPC_VAC_RMS_UVLO*SQRT_2)      /*!< [Under Voltage Lock Out Peak Value [Expressed in Volts]*/
 #define DPC_VAC_PK_UV                   (uint16_t)((float)DPC_VAC_RMS_UV*SQRT_2)        /*!< [Under Voltage Peak Value [Expressed in Volts]*/
 #define DPC_VAC_MIN                     20                                              /*!< [Expressed in Volts]*/
-#define DPC_IAC_MAX                     5                                              /*!< [Expressed in Amps]*/
+#define DPC_IAC_MAX                     50                                              /*!< [Expressed in Amps]*/
 
 
 
@@ -147,7 +147,7 @@
 ///DPC Task DEFINE of STDESPFCBDIR
 #define RefreshTime_DESIDERED           10000//20000                                           /*!< Expressed in hz */
 #define RefreshTime_TO_DESIDERED        1000                                            /*!< Expressed in hz */ 
-#define RefreshTime2_DESIDERED          10000//3000                                            /*!< Expressed in hz */
+#define RefreshTime2_DESIDERED          5000//3000                                            /*!< Expressed in hz */
 #define DPC_PI_ID_TS                    ((float)1/RefreshTime_DESIDERED)                /*!< Discrete time step of the PI regulator related to d-axis */
 #define DPC_PI_IQ_TS                    ((float)1/RefreshTime_DESIDERED)                /*!< Discrete time step of the PI regulator related to q-axis */
 #define DPC_PI_VDC_TS                   ((float)1/RefreshTime_DESIDERED)                /*!< Discrete time step of the PI regulator related to DC voltage control */

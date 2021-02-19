@@ -750,9 +750,18 @@ void DPC_PWM_Send_Duty_SPWM(DPC_PWM_TypeDef *tDPC_PWM_loc,float VA,float VB,floa
 //	  dutyVApos=0;
 //  }
   //else HAL_HRTIM_WaveformOutputStart(&PWM_Tim1,HRTIM_OUTPUT_TA1);
-  	DMA_SRC->phA=dutyVApos;
-  	DMA_SRC->phB=dutyVBpos;
-  	DMA_SRC->phC=dutyVCpos;
+  	DMA_SRC->phAA=dutyVApos;
+  	DMA_SRC->phAB=dutyVAneg;
+  	DMA_SRC->phBA=dutyVBpos;
+  	DMA_SRC->phBB=dutyVBneg;
+  	DMA_SRC->phCA=dutyVCpos;
+  	DMA_SRC->phCB=dutyVCneg;
+  	DMA_SRC->phA=dutyVApos+dutyVAneg;
+  	DMA_SRC->phB=dutyVBpos+dutyVBneg;
+  	DMA_SRC->phC=dutyVCpos+dutyVCneg;
+
+
+
   	//DMA_SRC[0]=5000;
 //  __HAL_HRTIM_SETCOMPARE(&hhrtim1, HRTIM_TIMERINDEX_TIMER_B,HRTIM_COMPAREUNIT_1,dutyVBpos);
 //  __HAL_HRTIM_SETCOMPARE(&hhrtim1, HRTIM_TIMERINDEX_TIMER_C,HRTIM_COMPAREUNIT_1,dutyVCpos);
@@ -1100,6 +1109,9 @@ void DPC_PWM_HRTIM_Start(void)
 	HAL_HRTIM_WaveformCounterStart_DMA(&PWM_Tim1, HRTIM_TIMERID_TIMER_A);
 	HAL_HRTIM_WaveformCounterStart_DMA(&PWM_Tim1, HRTIM_TIMERID_TIMER_B);
 	HAL_HRTIM_WaveformCounterStart_DMA(&PWM_Tim1, HRTIM_TIMERID_TIMER_C);
+	HAL_HRTIM_WaveformCountStart_IT(&PWM_Tim1, HRTIM_TIMERID_TIMER_A);
+	HAL_HRTIM_WaveformCountStart_IT(&PWM_Tim1, HRTIM_TIMERID_TIMER_B);
+	HAL_HRTIM_WaveformCountStart_IT(&PWM_Tim1, HRTIM_TIMERID_TIMER_C);
 	//HAL_HRTIM_WaveformCountStart_DMA(&hhrtim1, HRTIM_TIMERINDEX_TIMER_A);
 	//HAL_HRTIM_WaveformCounterStart(&PWM_Tim1, HRTIM_TIMERID_TIMER_B);
 	//HAL_HRTIM_WaveformCounterStart(&PWM_Tim1, HRTIM_TIMERID_TIMER_C);
