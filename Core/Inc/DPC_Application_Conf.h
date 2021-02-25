@@ -61,7 +61,7 @@
 
 //#define DPC_CTRL_INIT                   OPEN_LOOP                                     /*!<  DPC Init Operation */
 //#define DPC_CTRL_INIT                   CURRENT_LOOP                                  /*!<  DPC Init Operation */
-#define DPC_CTRL_INIT                   VOLTAGE_LOOP                                    /*!<  DPC Init Operation */  
+#define DPC_CTRL_INIT                   VOLTAGE_LOOP                                    /*!<  DPC Init Operation */
 
 
 #define DPC_PWM_INIT                    PWM_Armed                                       /*!<Use during normal operation*/
@@ -75,15 +75,15 @@
 ///AC MAIN DEFINE of STDES-PFCBIDIR
 #define DPC_VAC_220                                                                     /*!< Nominal AC Input Voltage - (Expressed in VOLT)*/
 //#define DPC_VAC_110                                                                     /*!< Nominal AC Input Voltage - (Expressed in VOLT)*/
-#define DPC_VAC                         50//180                                             /*!< Min AC Input Voltage - (Expressed in VOLT)*/
+#define DPC_VAC                         100//180                                             /*!< Min AC Input Voltage - (Expressed in VOLT)*/
 #define DPC_AC_3W                                                                       /*!< 3-WIRE AC Main Connection */
 //#define DPC_AC_4W                                                                       /*!< 4-WIRE AC Main Connection */
 ///DC OUTPUT  DEFINE of STDES-PFCBIDIR
-#define DPC_PFC_VDC_OUT                 150//720                                             /*!< DPC - DC Outout Voltage referance value of the Power converetr [Expresed in Volt]*/
+#define DPC_PFC_VDC_OUT                 700//720                                             /*!< DPC - DC Outout Voltage referance value of the Power converetr [Expresed in Volt]*/
 ///PROTECTION
-#define DPC_VAC_RMS_OV                  250                                             /*!< Over Voltage Limit AC main RMS Value [Expressed in Volts]*/
-#define DPC_VAC_RMS_UVLO                30//150                                             /*!< [Under Voltage Lock Out RMS Value [Expressed in Volts]*/
-#define DPC_VAC_RMS_UV                  20//50                                              /*!< [Under Voltage RMS Value [Expressed in Volts]*/
+#define DPC_VAC_RMS_OV                  400                                             /*!< Over Voltage Limit AC main RMS Value [Expressed in Volts]*/
+#define DPC_VAC_RMS_UVLO                50//150                                             /*!< [Under Voltage Lock Out RMS Value [Expressed in Volts]*/
+#define DPC_VAC_RMS_UV                  30//50                                              /*!< [Under Voltage RMS Value [Expressed in Volts]*/
 
 
 ///_________________________________________________________________________ADV APPLICATION CONFIGURATOR______________________________________
@@ -119,8 +119,8 @@
 
 
 ///DPC Theshold of STDES-PFCBIDIR
-#define DPC_START_NO_LOAD_CURR          10                                              /*!< [Expressed in AMPs]*/
-#define DPC_START_LOW_LOAD_CURR         10                                              /*!< [Expressed in AMPs]*/
+#define DPC_START_NO_LOAD_CURR          5                                              /*!< [Expressed in AMPs]*/
+#define DPC_START_LOW_LOAD_CURR         5                                              /*!< [Expressed in AMPs]*/
 #define DPC_NO_LOAD_CURR                0.5                                             /*!< [Expressed in AMPs]*/
 #define DPC_LOW_LOAD_CURR               1.2                                             /*!< [Expressed in AMPs]*/
 #define DPC_OVER_LOAD_CURR              20                                              /*!< [Expressed in AMPs]*/
@@ -130,13 +130,13 @@
 #define DPC_VAC_PK_UVLO                 (uint16_t)((float)DPC_VAC_RMS_UVLO*SQRT_2)      /*!< [Under Voltage Lock Out Peak Value [Expressed in Volts]*/
 #define DPC_VAC_PK_UV                   (uint16_t)((float)DPC_VAC_RMS_UV*SQRT_2)        /*!< [Under Voltage Peak Value [Expressed in Volts]*/
 #define DPC_VAC_MIN                     20                                              /*!< [Expressed in Volts]*/
-#define DPC_IAC_MAX                     50                                              /*!< [Expressed in Amps]*/
+#define DPC_IAC_MAX                     30                                              /*!< [Expressed in Amps]*/
 
 
 
 
 ///DPC LOAD Define of STDESPFCBIDIR
-#define DPC_VDC_OV                      650//850                                             /*!< DPC Output Voltage Higher Limit [Expressed in Volts]*/
+#define DPC_VDC_OV                      750//850                                             /*!< DPC Output Voltage Higher Limit [Expressed in Volts]*/
 //#define DPC_VDC_UV                      700                                             /*!< DPC Output Voltage Lower Limit [Expressed in Volts]*/
 #define DPC_VDC_UV                      400                                             /*!< DPC Output Voltage Lower Limit [Expressed in Volts]*/
 #define DPC_VCAP_LIM                    450                                             /*!< DPC Capacitor Voltage Limit [Expressed in Volts]*/
@@ -157,7 +157,7 @@
 #define DPC_VCTRL_KP                    4E-4                                            /*!< VCTRL - Proportional gain of the PI regulator related to DC voltage control*/
 #define DPC_VCTRL_KI                    0.3                                             /*!< VCTRL - Integral gain of the PI regulator related to DC voltage control*/
 #define DPC_PFC_VDC                     DPC_PFC_VDC_OUT                                 /*!< VCTRL - DC Voltage referance value of the PFC [Expresed in Volt]*/
-#define DPC_PFC_Iref_sat                22                                              /*!< VCTRL - d-q axis AC Current referance limit of the PFC [Expresed in AMPs]*/
+#define DPC_PFC_Iref_sat                10//22                                              /*!< VCTRL - d-q axis AC Current referance limit of the PFC [Expresed in AMPs]*/
 #define DPC_VCTRL_PI_AWTG               0.02                                            /*!< VCTRL - Anti Wind-up GAIN*/
 #define DPC_VCTRL_PI_sat_up             ((float)DPC_PFC_Iref_sat/(float)G_IAC)          /*!< VCTRL - Higher Current Referance Saturation LIMIT*/
 #define DPC_VCTRL_PI_sat_down           0                                               /*!< VCTRL - Lower Current Referance Saturation LIMIT*/
@@ -203,7 +203,7 @@
 #define PLL_KP                          20                                              /*!< PLL - Proportional gain of Phase Loched Loop algorithm*/
 #define PLL_KI                          500//5000                                            /*!< PLL - Integral gain of Phase Loched Loop algorithm*/
 #define PLL_PHI_2pi                     -1.570796                                       /*!< PLL - Constant "-pi/2" [Expressed in rad]*/
-#define PLL_DELTA_F                     20                                              /*!<*/
+#define PLL_DELTA_F                     5                                              /*!<*/
 #define PLL_FF_Hz                       50                                              /*!< PLL - Feed Forward term of the VTO in Phase Loched Loop algorithm [Expressed in Hz]*/
 #define DPC_PLL_SAT_EN                  SET                                             /*!< PLL - Saturation Enable*/ 
 #define DPC_PLL_FGRID                   50                                              /*!< [Expressed in Hz]*/

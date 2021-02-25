@@ -71,6 +71,8 @@ uint16_t Service_counter;
 uint32_t Prev_Saturation;
 uint32_t Flag;
 uint32_t Flag2;
+uint16_t Relay_state;
+uint32_t Timeout[5];
 
 /*!FSM*/
 PC_State_TypeDef PC_State;                                      /*!< */
@@ -263,7 +265,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_SET);
+
 
 	  HAL_GPIO_WritePin(PFC_SW_SRC_GPIO_Port, PFC_SW_SRC_Pin, GPIO_PIN_SET);
 
@@ -362,13 +364,38 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		//DATA_CURR_Write_ClarkePark(Current_qdo_Phy);  // Current qdo in DATA layer
 
 		PC_State=FSM_Run;
-		if (Status_Source!=OVERCURRENT_SOURCE) Status_Source=OK_SOURCE;
-		if (Status_Source==OK_SOURCE){
-			FSM_Run_State = Run_PFC_Mode;
-		}
-		else FSM_Run_State = Run_Idle;
-//
 
+
+		if (VOLTAGE_ADC_DC_IN_PHY.Vdc_tot>=360){
+			HAL_GPIO_WritePin(GPIOA, Relay_Pin, GPIO_PIN_SET);
+			Relay_state=1;
+			if (Timeout[0]>5000){
+
+			}
+		}
+		else if (VOLTAGE_ADC_DC_IN_PHY.Vdc_tot<355){
+			HAL_GPIO_WritePin(GPIOA, Relay_Pin, GPIO_PIN_RESET);
+			Relay_state=0;
+			Timeout[0]=0;
+		}
+		else {
+			Timeout[0]=0;
+		}
+
+		//PC_State=FSM_StartUp_burst;
+		//if (Status_Source!=OVERCURRENT_SOURCE) Status_Source=OK_SOURCE;
+		if (Status_Source==OK_SOURCE && Relay_state==1 && PLL_Status==PLL_SYNC && Status_Load!=OVERCURRENT_LOAD
+				&& Status_Load!=OVERVOLTAGE_CAP && Status_Load!=OVERVOLTAGE_LOAD){
+			FSM_Run_State = Run_PFC_Mode;
+			HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_SET);
+
+		}
+		else {
+			FSM_Run_State = Run_Idle;
+			HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_RESET);
+		}
+//
+		//FSM_Run_State = Run_Idle;
 
 		if (PC_State==FSM_Run)                                      ///__________FSM_Run________
 		{
@@ -422,8 +449,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		Flag = __HAL_HRTIM_GET_FLAG(&hhrtim1,HRTIM_FLAG_FLT1);
 
 //		VOLTAGE_ADC_AC_IN_BITS.phA = (float)(Flag[0]);
-		Service_data[0][Service_step] = DMA_HRTIM_SRC.phA;
-		Service_data[1][Service_step] = DMA_HRTIM_SRC.phAB;
+//		Service_data[0][Service_step] = DMA_HRTIM_SRC.phA;
+//		Service_data[1][Service_step] = DMA_HRTIM_SRC.phAB;
 //		Service_data[2][Service_step] = V_DQO_CTRL.axd;
 //		Service_data[3][Service_step] = DMA_HRTIM_SRC[0];
 
@@ -432,6 +459,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 	else if(htim->Instance == TIM3){
 		TimeoutMng();
+		Timeout[0]++;
 	}
 	else if(htim->Instance == TIM6){
 
@@ -475,22 +503,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	VOLTAGE_AC_qd_IN_NORM=*((VoltageAC_qd_PLL_Struct*)&Voltage_qdo);                                    ///Auxiliary Data for PLL
 	PLL_Status=DPC_PLL_pllqd_Run(&PLL_CONVERTER,&VOLTAGE_AC_qd_IN_NORM,&theta_out_pll,&omega_out_pll);  ///PLL Phase Extimation
 	DATA_Write_Theta_PLL(PLL_CONVERTER.pll_theta_out_2pi);                                              ///Pass Theta to DATA LAYER
-
-
-	if (VOLTAGE_ADC_DC_IN_PHY.Vdc_tot>=30){
-		HAL_GPIO_WritePin(GPIOA, Relay_Pin, GPIO_PIN_SET);
-	}
-	else{
-		HAL_GPIO_WritePin(GPIOA, Relay_Pin, GPIO_PIN_RESET);
-	}
 	}
 }
 
 void HAL_HRTIM_Fault1Callback(HRTIM_HandleTypeDef *hhrtim){
 	Status_Source=OVERCURRENT_SOURCE;
+	AC_SOURCE.Status_Source=OVERCURRENT_SOURCE;
+	HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_SET);
+
 }
 void HAL_HRTIM_Fault3Callback(HRTIM_HandleTypeDef *hhrtim){
 	Status_Source=OVERCURRENT_SOURCE;
+	AC_SOURCE.Status_Source=OVERCURRENT_SOURCE;
+	HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_SET);
 }
 
 /* USER CODE END 4 */

@@ -1,7 +1,7 @@
-main.c:197:5:main	88	static
-main.c:281:6:SystemClock_Config	168	static
-main.c:336:7:DPC_MISC_Analog_Start	8	static
-main.c:340:6:HAL_TIM_PeriodElapsedCallback	48	static
-main.c:489:6:HAL_HRTIM_Fault1Callback	16	static
-main.c:492:6:HAL_HRTIM_Fault3Callback	16	static
-main.c:502:6:Error_Handler	4	static,ignoring_inline_asm
+main.c:199:5:main	88	static
+main.c:283:6:SystemClock_Config	168	static
+main.c:338:7:DPC_MISC_Analog_Start	8	static
+main.c:342:6:HAL_TIM_PeriodElapsedCallback	48	static
+main.c:509:6:HAL_HRTIM_Fault1Callback	16	static
+main.c:515:6:HAL_HRTIM_Fault3Callback	16	static
+main.c:527:6:Error_Handler	4	static,ignoring_inline_asm
