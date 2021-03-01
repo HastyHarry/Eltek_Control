@@ -47,6 +47,7 @@
 // Tipology: - DPC_PWM_1ADVTIM_3CH, use 1 Advanced Control Timer with 3 channel.
 //           - DPC_PWM_2ADVTIM_3CH_3CHX, use 1 Advanced Control Timer with 3 channel + complementary channels.
 
+#define STDES_PFCBIDIR
 
 
 ///__Start_________________________________________________________________STDES_PFCBIDIR_REV2_______________________________________________________________________
@@ -75,11 +76,11 @@
 ///AC MAIN DEFINE of STDES-PFCBIDIR
 #define DPC_VAC_220                                                                     /*!< Nominal AC Input Voltage - (Expressed in VOLT)*/
 //#define DPC_VAC_110                                                                     /*!< Nominal AC Input Voltage - (Expressed in VOLT)*/
-#define DPC_VAC                         100//180                                             /*!< Min AC Input Voltage - (Expressed in VOLT)*/
+#define DPC_VAC                         180//180                                             /*!< Min AC Input Voltage - (Expressed in VOLT)*/
 #define DPC_AC_3W                                                                       /*!< 3-WIRE AC Main Connection */
 //#define DPC_AC_4W                                                                       /*!< 4-WIRE AC Main Connection */
 ///DC OUTPUT  DEFINE of STDES-PFCBIDIR
-#define DPC_PFC_VDC_OUT                 700//720                                             /*!< DPC - DC Outout Voltage referance value of the Power converetr [Expresed in Volt]*/
+#define DPC_PFC_VDC_OUT                 500//720                                             /*!< DPC - DC Outout Voltage referance value of the Power converetr [Expresed in Volt]*/
 ///PROTECTION
 #define DPC_VAC_RMS_OV                  400                                             /*!< Over Voltage Limit AC main RMS Value [Expressed in Volts]*/
 #define DPC_VAC_RMS_UVLO                50//150                                             /*!< [Under Voltage Lock Out RMS Value [Expressed in Volts]*/
@@ -94,12 +95,12 @@
 #elif defined(DPC_AC_4W)
 #define INRUSH_VREF_V                   (uint16_t)((float)DPC_VAC*SQRT_2*2.0)           /*!< INRUSH DC Voltage threshold - (Expressed in VOLT)*/
 #endif
-#define DPC_INRS_EN                     SET                                             /*!<*/
+#define DPC_INRS_EN                     RESET                                             /*!<*/
 #define INRUSH_VLIM                     30                                              /*!< [Expressed in volt]*/
 
 
 ///DPC START Burst Define of STDES-PFCBIDIR
-#define DPC_STARTBURST_DUTY             0.1                                             /*!< [Expressed in Unit]*/
+#define DPC_STARTBURST_DUTY             0.03                                             /*!< [Expressed in Unit]*/
 #define STARTBURST_VREF_V               DPC_PFC_VDC_OUT                                 /*!< [Expressed in Volts]*/
 #define START_BURST_VHIST               10                                              /*!< [Expressed in Volts]*/
 #define DPC_STARTBURST_EN               SET                                             /*!< [Expressed in Boolean]*/ 
@@ -107,7 +108,7 @@
 
 ///DPC Run Burst Define of STDES-PFCBIDIR
 #ifdef DPC_VAC_220
-#define DPC_BURST_DUTY_NL               0.15                                            /*!< [Expressed in Unit]*/
+#define DPC_BURST_DUTY_NL               0.1                                            /*!< [Expressed in Unit]*/
 #define DPC_BURST_DUTY_LL               0.25                                            /*!< [Expressed in Unit]*/
 #elif DPC_VAC_110
 #define DPC_BURST_DUTY_NL               0.4                                             /*!< [Expressed in Unit]*/
@@ -119,10 +120,10 @@
 
 
 ///DPC Theshold of STDES-PFCBIDIR
-#define DPC_START_NO_LOAD_CURR          5                                              /*!< [Expressed in AMPs]*/
-#define DPC_START_LOW_LOAD_CURR         5                                              /*!< [Expressed in AMPs]*/
-#define DPC_NO_LOAD_CURR                0.5                                             /*!< [Expressed in AMPs]*/
-#define DPC_LOW_LOAD_CURR               1.2                                             /*!< [Expressed in AMPs]*/
+#define DPC_START_NO_LOAD_CURR          3                                             /*!< [Expressed in AMPs]*/
+#define DPC_START_LOW_LOAD_CURR         4                                              /*!< [Expressed in AMPs]*/
+#define DPC_NO_LOAD_CURR                5                                             /*!< [Expressed in AMPs]*/
+#define DPC_LOW_LOAD_CURR               6                                             /*!< [Expressed in AMPs]*/
 #define DPC_OVER_LOAD_CURR              20                                              /*!< [Expressed in AMPs]*/
 #define DPC_NO_LOAD_DELTA_CURR          20                                              /*!< [Expressed in % Percentage]*/
 #define DPC_LOW_LOAD_DELTA_CURR         30                                              /*!< [Expressed in % Percentage]*/
@@ -256,6 +257,8 @@
 ///DPC TIMEOUTs Define of STDESPFCBIDIR
 #define TO_IDLE_Tick                    1000                                           /*!< Timeout Index - TimeOut_IDLE [mills]*/
 
+//Relays delay
+#define RELAY_TIMEOUT 5000
 
 /* Exported functions ------------------------------------------------------- */
 

@@ -500,173 +500,206 @@ sBreakDeadTimeConfig.DeadTime = uwDeadTimeSub;
   *
   * @note Function valid for STM32G4xx microconroller family   
   */
-void DPC_PWM_Send_Burst_PWM(DPC_PWM_TypeDef *tDPC_PWM_loc,float BURST_A,float BURST_B,float BURST_C){
+void DPC_PWM_Send_Burst_PWM(DPC_PWM_TypeDef *tDPC_PWM_loc,float BURST_A,float BURST_B,float BURST_C,DMA_PWMDUTY_STRUCT* DMA_SRC ){
 
-//#ifdef STDES_PFCBIDIR
-//
-//    #ifdef DPC_PWM_1ADVTIM_3CH
-//
-//
-////DPC_PWM_1ADVTIM_3CH
-//
-//#elif   defined(DPC_PWM_2ADVTIM_3CH_3CHX)
-//  //_______________________
-//  uint16_t PWM_PERIOD_COUNTER_INT;
-//
-//  PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&PWM_Tim1);                                    /*!< Check and upgrade if Burst period is correct >*/
-//  if (PWM_PERIOD_COUNTER_INT!=tDPC_PWM_loc->PWM_Period){
-//    DPC_PWM_OutDisable();
-//    __HAL_TIM_SET_AUTORELOAD(&PWM_Tim1, tDPC_PWM_loc->PWM_Period);
-//    DPC_PWM_OutEnable(tDPC_PWM_loc);
-//  }
-//
-//  PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&PWM_Tim2);                                    /*!< Check and upgrade if Burst period is correct >*/
-//  if (PWM_PERIOD_COUNTER_INT!=tDPC_PWM_loc->PWM_Period){
-//    DPC_PWM_OutDisable();
-//    __HAL_TIM_SET_AUTORELOAD(&PWM_Tim2, tDPC_PWM_loc->PWM_Period);
-//    DPC_PWM_OutEnable(tDPC_PWM_loc);
-//  }
-//
-//  PWM_PERIOD_COUNTER_INT=tDPC_PWM_loc->PWM_Period;                                              /*!< load period  >*/
-//
-//    PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&htim1);                                    ///Future improuvments: USE MACRO INSTEAD PWM_PERIOD_COUNTER_INT
-//
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_1, (uint32_t)((1.0f-BURST_A)*PWM_PERIOD_COUNTER_INT));
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_2, (uint32_t)((1.0f-BURST_B)*PWM_PERIOD_COUNTER_INT));
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_3, (uint32_t)((1.0f-BURST_C)*PWM_PERIOD_COUNTER_INT));
-//
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_1, (uint32_t)((1.0f-BURST_A)*PWM_PERIOD_COUNTER_INT));
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_2, (uint32_t)((1.0f-BURST_B)*PWM_PERIOD_COUNTER_INT));
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_3, (uint32_t)((1.0f-BURST_C)*PWM_PERIOD_COUNTER_INT));
-//
-////DPC_PWM_2ADVTIM_3CH_3CHX
-//
-//
-//#elif   defined(DPC_PWM_1HRTIM_3CH)
-///*             _______WIP_____
-//  uint16_t ValueH;
-//  uint16_t ValueL;
-//  uint16_t Period;
-//  Period=__HAL_HRTIM_GETPERIOD(&hhrtim1, 0x0);
-//  ValueH =(uint16_t)( Period *  Duty);
-//  ValueL =(uint16_t)( Period *  (float)(1.0-Duty));
+#ifdef STDES_PFCBIDIR
+
+    #ifdef DPC_PWM_1ADVTIM_3CH
+
+
+//DPC_PWM_1ADVTIM_3CH
+
+#elif   defined(DPC_PWM_2ADVTIM_3CH_3CHX)
+  //_______________________
+  uint16_t PWM_PERIOD_COUNTER_INT;
+
+  PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&PWM_Tim1);                                    /*!< Check and upgrade if Burst period is correct >*/
+  if (PWM_PERIOD_COUNTER_INT!=tDPC_PWM_loc->PWM_Period){
+    DPC_PWM_OutDisable();
+    __HAL_TIM_SET_AUTORELOAD(&PWM_Tim1, tDPC_PWM_loc->PWM_Period);
+    DPC_PWM_OutEnable(tDPC_PWM_loc);
+  }
+
+  PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&PWM_Tim2);                                    /*!< Check and upgrade if Burst period is correct >*/
+  if (PWM_PERIOD_COUNTER_INT!=tDPC_PWM_loc->PWM_Period){
+    DPC_PWM_OutDisable();
+    __HAL_TIM_SET_AUTORELOAD(&PWM_Tim2, tDPC_PWM_loc->PWM_Period);
+    DPC_PWM_OutEnable(tDPC_PWM_loc);
+  }
+
+  PWM_PERIOD_COUNTER_INT=tDPC_PWM_loc->PWM_Period;                                              /*!< load period  >*/
+
+    PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&htim1);                                    ///Future improuvments: USE MACRO INSTEAD PWM_PERIOD_COUNTER_INT
+
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_1, (uint32_t)((1.0f-BURST_A)*PWM_PERIOD_COUNTER_INT));
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_2, (uint32_t)((1.0f-BURST_B)*PWM_PERIOD_COUNTER_INT));
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_3, (uint32_t)((1.0f-BURST_C)*PWM_PERIOD_COUNTER_INT));
+
+  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_1, (uint32_t)((1.0f-BURST_A)*PWM_PERIOD_COUNTER_INT));
+  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_2, (uint32_t)((1.0f-BURST_B)*PWM_PERIOD_COUNTER_INT));
+  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_3, (uint32_t)((1.0f-BURST_C)*PWM_PERIOD_COUNTER_INT));
+
+//DPC_PWM_2ADVTIM_3CH_3CHX
+
+
+#elif   defined(DPC_PWM_1HRTIM_3CH)
+/*             _______WIP_____
+  uint16_t ValueH;
+  uint16_t ValueL;
+  uint16_t Period;
+  Period=__HAL_HRTIM_GETPERIOD(&hhrtim1, 0x0);
+  ValueH =(uint16_t)( Period *  Duty);
+  ValueL =(uint16_t)( Period *  (float)(1.0-Duty));
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x0,HRTIM_COMPAREUNIT_1,ValueH);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x1,HRTIM_COMPAREUNIT_1,ValueL);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x2,HRTIM_COMPAREUNIT_1,ValueH);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x3,HRTIM_COMPAREUNIT_1,ValueL);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x4,HRTIM_COMPAREUNIT_1,ValueH);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x5,HRTIM_COMPAREUNIT_1,ValueL);
+            _______WIP_____
+*/
+
+#else
+
+
+
+#endif
+
+
+#elif STDES_PFCBIDIR_REV2
+
+    #ifdef DPC_PWM_1ADVTIM_3CH
+
+
+//DPC_PWM_1ADVTIM_3CH
+
+#elif   defined(DPC_PWM_2ADVTIM_3CH_3CHX)
+    uint16_t PWM_PERIOD_COUNTER_INT;
+    PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&htim1);   ///Future improuvments: USE MACRO INSTEAD PWM_PERIOD_COUNTER_INT
+
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_1, (uint32_t)((1.0f-BURST_A)*PWM_PERIOD_COUNTER_INT));
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_2, (uint32_t)((1.0f-BURST_B)*PWM_PERIOD_COUNTER_INT));
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_3, (uint32_t)((1.0f-BURST_C)*PWM_PERIOD_COUNTER_INT));
+
+  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_1, (uint32_t)((1.0f-BURST_A)*PWM_PERIOD_COUNTER_INT));
+  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_2, (uint32_t)((1.0f-BURST_B)*PWM_PERIOD_COUNTER_INT));
+  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_3, (uint32_t)((1.0f-BURST_C)*PWM_PERIOD_COUNTER_INT));
+
+//DPC_PWM_2ADVTIM_3CH_3CHX
+
+#elif   defined(DPC_PWM_1HRTIM_3CH)
+/*             _______WIP_____
+  uint16_t ValueH;
+  uint16_t ValueL;
+  uint16_t Period;
+  Period=__HAL_HRTIM_GETPERIOD(&hhrtim1, 0x0);
+  ValueH =(uint16_t)( Period *  Duty);
+  ValueL =(uint16_t)( Period *  (float)(1.0-Duty));
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x0,HRTIM_COMPAREUNIT_1,ValueH);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x1,HRTIM_COMPAREUNIT_1,ValueL);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x2,HRTIM_COMPAREUNIT_1,ValueH);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x3,HRTIM_COMPAREUNIT_1,ValueL);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x4,HRTIM_COMPAREUNIT_1,ValueH);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x5,HRTIM_COMPAREUNIT_1,ValueL);
+            _______WIP_____
+*/
+
+#else
+
+
+
+#endif
+
+
+#elif STDES_VIENNARECT
+
+    #ifdef DPC_PWM_1ADVTIM_3CH
+
+    uint16_t PWM_PERIOD_COUNTER_INT;
+    PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&htim1, 0x0);   ///Future improuvments: USE MACRO INSTEAD PWM_PERIOD_COUNTER_INT
+
+
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_1, (uint32_t)BURST_B*PWM_PERIOD_COUNTER_INT);
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_2, (uint32_t)BURST_C*PWM_PERIOD_COUNTER_INT);
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_3, (uint32_t)BURST_A*PWM_PERIOD_COUNTER_INT);
+
+
+//DPC_PWM_1ADVTIM_3CH
+
+#elif   defined(DPC_PWM_2ADVTIM_3CH_3CHX)
+
+
+    uint16_t PWM_PERIOD_COUNTER_INT;
+    PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&htim1);   ///Future improuvments: USE MACRO INSTEAD PWM_PERIOD_COUNTER_INT
+
+
+
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_1, (uint32_t)BURST_A*PWM_PERIOD_COUNTER_INT);
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_2, (uint32_t)BURST_B*PWM_PERIOD_COUNTER_INT);
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_3, (uint32_t)BURST_C*PWM_PERIOD_COUNTER_INT);
+
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_1, (uint32_t)BURST_A*PWM_PERIOD_COUNTER_INT);
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_2, (uint32_t)BURST_B*PWM_PERIOD_COUNTER_INT);
+  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_3, (uint32_t)BURST_C*PWM_PERIOD_COUNTER_INT);
+
+//DPC_PWM_2ADVTIM_3CH_3CHX
+
+
+#elif   defined(DPC_PWM_1HRTIM_3CH)
+  uint16_t ValuePhA;
+  uint16_t ValuePhB;
+  uint16_t ValuePhC;
+  uint16_t Period;
+  Period=__HAL_HRTIM_GETPERIOD(&hhrtim1, 0x0);
+  ValuePhA =(uint16_t)((1.0f-BURST_A)*Period);
+  ValuePhB =(uint16_t)((1.0f-BURST_B)*Period);
+  ValuePhC =(uint16_t)((1.0f-BURST_C)*Period);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x0,HRTIM_COMPAREUNIT_1,ValuePhB);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x0,HRTIM_COMPAREUNIT_2,ValuePhC);
+  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x1,HRTIM_COMPAREUNIT_1,ValuePhA);
+#else
+
+
+#endif
+
+#else
+  SELECT DEFINE  // ERROR TO PREVENT NO APPLICATION DEFINITION
+
+#endif
+
+
+  uint32_t dutyVApos;
+  uint32_t dutyVAneg;
+  uint32_t dutyVBpos;
+  uint32_t dutyVBneg;
+  uint32_t dutyVCpos;
+  uint32_t dutyVCneg;
+
+  uint16_t PWM_PERIOD_COUNTER_INT;
+
+  PWM_PERIOD_COUNTER_INT=__HAL_HRTIM_GETPERIOD(&PWM_Tim1, HRTIM_TIMERINDEX_TIMER_A);
+  dutyVApos = BURST_A*PWM_PERIOD_COUNTER_INT;
+  dutyVBpos = BURST_B*PWM_PERIOD_COUNTER_INT;
+  dutyVCpos = BURST_C*PWM_PERIOD_COUNTER_INT;
+
+
+	DMA_SRC->phAA=dutyVApos;
+	DMA_SRC->phAB=dutyVApos;
+	DMA_SRC->phBA=dutyVBpos;
+	DMA_SRC->phBB=dutyVBpos;
+	DMA_SRC->phCA=dutyVCpos;
+	DMA_SRC->phCB=dutyVCpos;
+	DMA_SRC->phA=dutyVApos;
+	DMA_SRC->phB=dutyVBpos;
+	DMA_SRC->phC=dutyVCpos;
+
 //  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x0,HRTIM_COMPAREUNIT_1,ValueH);
 //  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x1,HRTIM_COMPAREUNIT_1,ValueL);
 //  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x2,HRTIM_COMPAREUNIT_1,ValueH);
 //  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x3,HRTIM_COMPAREUNIT_1,ValueL);
 //  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x4,HRTIM_COMPAREUNIT_1,ValueH);
 //  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x5,HRTIM_COMPAREUNIT_1,ValueL);
-//            _______WIP_____
-//*/
-//
-//#else
-//
-//
-//
-//#endif
-//
-//
-//#elif STDES_PFCBIDIR_REV2
-//
-//    #ifdef DPC_PWM_1ADVTIM_3CH
-//
-//
-////DPC_PWM_1ADVTIM_3CH
-//
-//#elif   defined(DPC_PWM_2ADVTIM_3CH_3CHX)
-//    uint16_t PWM_PERIOD_COUNTER_INT;
-//    PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&htim1);   ///Future improuvments: USE MACRO INSTEAD PWM_PERIOD_COUNTER_INT
-//
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_1, (uint32_t)((1.0f-BURST_A)*PWM_PERIOD_COUNTER_INT));
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_2, (uint32_t)((1.0f-BURST_B)*PWM_PERIOD_COUNTER_INT));
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_3, (uint32_t)((1.0f-BURST_C)*PWM_PERIOD_COUNTER_INT));
-//
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_1, (uint32_t)((1.0f-BURST_A)*PWM_PERIOD_COUNTER_INT));
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_2, (uint32_t)((1.0f-BURST_B)*PWM_PERIOD_COUNTER_INT));
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim2, PWM_CHANNEL_3, (uint32_t)((1.0f-BURST_C)*PWM_PERIOD_COUNTER_INT));
-//
-////DPC_PWM_2ADVTIM_3CH_3CHX
-//
-//#elif   defined(DPC_PWM_1HRTIM_3CH)
-///*             _______WIP_____
-//  uint16_t ValueH;
-//  uint16_t ValueL;
-//  uint16_t Period;
-//  Period=__HAL_HRTIM_GETPERIOD(&hhrtim1, 0x0);
-//  ValueH =(uint16_t)( Period *  Duty);
-//  ValueL =(uint16_t)( Period *  (float)(1.0-Duty));
-//  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x0,HRTIM_COMPAREUNIT_1,ValueH);
-//  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x1,HRTIM_COMPAREUNIT_1,ValueL);
-//  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x2,HRTIM_COMPAREUNIT_1,ValueH);
-//  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x3,HRTIM_COMPAREUNIT_1,ValueL);
-//  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x4,HRTIM_COMPAREUNIT_1,ValueH);
-//  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x5,HRTIM_COMPAREUNIT_1,ValueL);
-//            _______WIP_____
-//*/
-//
-//#else
-//
-//
-//
-//#endif
   
-  
-//#elif STDES_VIENNARECT
-//
-//    #ifdef DPC_PWM_1ADVTIM_3CH
-//
-//    uint16_t PWM_PERIOD_COUNTER_INT;
-//    PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&htim1, 0x0);   ///Future improuvments: USE MACRO INSTEAD PWM_PERIOD_COUNTER_INT
-//
-//
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_1, (uint32_t)BURST_B*PWM_PERIOD_COUNTER_INT);
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_2, (uint32_t)BURST_C*PWM_PERIOD_COUNTER_INT);
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_3, (uint32_t)BURST_A*PWM_PERIOD_COUNTER_INT);
-//
-//
-////DPC_PWM_1ADVTIM_3CH
-//
-//#elif   defined(DPC_PWM_2ADVTIM_3CH_3CHX)
-//
-//
-//    uint16_t PWM_PERIOD_COUNTER_INT;
-//    PWM_PERIOD_COUNTER_INT=__HAL_TIM_GET_AUTORELOAD(&htim1);   ///Future improuvments: USE MACRO INSTEAD PWM_PERIOD_COUNTER_INT
-//
-//
-//
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_1, (uint32_t)BURST_A*PWM_PERIOD_COUNTER_INT);
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_2, (uint32_t)BURST_B*PWM_PERIOD_COUNTER_INT);
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_3, (uint32_t)BURST_C*PWM_PERIOD_COUNTER_INT);
-//
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_1, (uint32_t)BURST_A*PWM_PERIOD_COUNTER_INT);
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_2, (uint32_t)BURST_B*PWM_PERIOD_COUNTER_INT);
-//  __HAL_TIM_SET_COMPARE(&PWM_Tim1, PWM_CHANNEL_3, (uint32_t)BURST_C*PWM_PERIOD_COUNTER_INT);
-//
-////DPC_PWM_2ADVTIM_3CH_3CHX
-//
-//
-//#elif   defined(DPC_PWM_1HRTIM_3CH)
-//  uint16_t ValuePhA;
-//  uint16_t ValuePhB;
-//  uint16_t ValuePhC;
-//  uint16_t Period;
-//  Period=__HAL_HRTIM_GETPERIOD(&hhrtim1, 0x0);
-//  ValuePhA =(uint16_t)((1.0f-BURST_A)*Period);
-//  ValuePhB =(uint16_t)((1.0f-BURST_B)*Period);
-//  ValuePhC =(uint16_t)((1.0f-BURST_C)*Period);
-//  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x0,HRTIM_COMPAREUNIT_1,ValuePhB);
-//  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x0,HRTIM_COMPAREUNIT_2,ValuePhC);
-//  __HAL_HRTIM_SETCOMPARE(&hhrtim1, 0x1,HRTIM_COMPAREUNIT_1,ValuePhA);
-//#else
-//
-//
-//#endif
-//
-//#else
-//  SELECT DEFINE  // ERROR TO PREVENT NO APPLICATION DEFINITION
-//
-//#endif
-
 }
 
 

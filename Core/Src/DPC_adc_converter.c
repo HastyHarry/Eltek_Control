@@ -230,6 +230,14 @@ void DPC_ADC_Init(DPC_ADC_Conf_TypeDef *DPC_ADC_Conf,float G_Vac,float B_Vac,flo
   
 }
 
+/**
+  * @brief  DPC_ADC_Default_Init
+  * @param  None
+  * @retval None
+  *
+  * @note Function valid for STM32G4xx microconroller family
+  */
+
 void DPC_ADC_Default_Init(){
 
 	  ADC_MultiModeTypeDef multimode = {0};
@@ -351,4 +359,27 @@ void DPC_ADC_Default_Init(){
 	  {
 	    Error_Handler();
 	  }
+}
+
+
+/**
+  * @brief  Current_DC_Calc
+  * @param  VOLTAGE_ADC_DC_IN_NORM_Sub DC Voltage Value in Volts
+  * @param  VOLTAGE_ADC_AC_IN_NORM_Sub AC Voltage Value in Volts
+  * @param  CURRENT_ADC_AC_IN_NORM_Sub AC Current Value in Amps
+  *
+  * @retval CURRENT_ADC_DC_IN_NORM_Sub DC Current Value in Amps
+  *
+  * @note Function valid for STM32G4xx microconroller family
+  */
+void Current_DC_Calc(VoltageDC_ADC_NORM_Struct* VOLTAGE_ADC_DC_IN_NORM_Sub, VoltageAC_ADC_NORM_Struct* VOLTAGE_ADC_AC_IN_NORM_Sub,
+			VoltageAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_NORM_Sub, CurrentDC_ADC_NORM_Struct_t* CURRENT_ADC_DC_IN_NORM_Sub){
+	float P_AC1;
+	float P_AC2;
+	float P_AC3;
+	P_AC1 = (float) VOLTAGE_ADC_AC_IN_NORM_Sub->phA * CURRENT_ADC_AC_IN_NORM_Sub->phA;
+	P_AC2 = (float) VOLTAGE_ADC_AC_IN_NORM_Sub->phB * CURRENT_ADC_AC_IN_NORM_Sub->phB;
+	P_AC3 = (float) VOLTAGE_ADC_AC_IN_NORM_Sub->phC * CURRENT_ADC_AC_IN_NORM_Sub->phC;
+
+	CURRENT_ADC_DC_IN_NORM_Sub->IDC_adc = (float)((P_AC1+P_AC2+P_AC3)/VOLTAGE_ADC_DC_IN_NORM_Sub->Vdc_tot);
 }

@@ -142,7 +142,9 @@ void DPC_PWM_ADVTIM_PWMStart(void);
 void DPC_PWM_ADVTIM_PWMPWMStop(void);
 void DPC_PWM_SET_Dead_Time(uint16_t uwDeadTimeSub);
 void DPC_PWM_Send_Duty_SPWM(DPC_PWM_TypeDef *tDPC_PWM_loc,float VA,float VB,float VC, DMA_PWMDUTY_STRUCT* DMA_SRC);
-void DPC_PWM_Send_Burst_PWM(DPC_PWM_TypeDef *tDPC_PWM_loc,float BURST_A,float BURST_B,float BURST_C);
+//void DPC_PWM_Send_Burst_PWM(DPC_PWM_TypeDef *tDPC_PWM_loc,float BURST_A,float BURST_B,float BURST_C);
+void DPC_PWM_Send_Burst_PWM(DPC_PWM_TypeDef *tDPC_PWM_loc,float BURST_A,float BURST_B,float BURST_C,DMA_PWMDUTY_STRUCT* DMA_SRC );
+
 
 void Send_Duty_2LC_SPWM(float VA,float VB,float VC,uint32_t  PWM_PERIOD_COUNTER_INT);
 void RefreshDuty(uint16_t LUTsinePOS[],uint16_t LUTsineNEG[],treephaseSTRUCT *LUT_3PH,uint32_t  PWM_PERIOD_COUNTER);

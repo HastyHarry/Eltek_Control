@@ -150,12 +150,17 @@ void Voltage_Control(VOLTAGECTRL_Struct *pVOLTAGECTRL_sub,PI_STRUCT_t *pPI_VDC_C
 void DPC_LPCNTRL_PFC_Mode_Reset(PI_STRUCT_t *PI_VDC_CTRL, CDC_Struct *CDC);
 void DPC_LPCNTRL_PFC_Mode(PFC_CTRL_t *pPFC_CTRL_loc, PI_STRUCT_t *pPI_VDC_CTRL, VOLTAGECTRL_Struct *VOLTAGECTRL, CDC_Struct *CDC,TRANSFORM_QDO_t *V_DQO_CTRL, TRANSFORM_QDO_t *Current_qdo,TRANSFORM_QDO_t *Voltage_qdo,VoltageDC_ADC_NORM_Struct *VOLTAGE_ADC_AC_IN_PHY);
 void DPC_LPCNTRL_BURST_Init(BURST_STRUCT *BURST_t_local,FlagStatus Burst_Enable_loc,uint16_t Vref_hist_loc,uint16_t delta_Vref_hist,float I_dc_NO_LOAD_Limit_AMP_loc,float I_dc_LOW_LOAD_Limit_AMP_loc,float duty_local,float duty_no_load_local,DPC_ADC_Conf_TypeDef *DPC_ADC_Conf_loc);
-BURST_StatusTypeDef DPC_LPCNTRL_Burst_Check(uint32_t* p_Data_Sub,uint32_t* iDC_Data_Sub,BURST_STRUCT *BURST_CTRL_f);
+//BURST_StatusTypeDef DPC_LPCNTRL_Burst_Check(uint32_t* p_Data_Sub,uint32_t* iDC_Data_Sub,BURST_STRUCT *BURST_CTRL_f);
+BURST_StatusTypeDef DPC_LPCNTRL_Burst_Check(uint32_t* p_Data_Sub, CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_NORM_Sub/*uint32_t* iDC_Data_Sub*/,BURST_STRUCT *BURST_CTRL_f);
 void DPC_LPCNTRL_CDC_Init(CDC_Struct *CDC,float omegagrid_loc,float Inductor_loc,FlagStatus FF_Enable_SET,FlagStatus Decoupling_Enable_SET,FlagStatus VDC_FF_Enable_SET);
 void DPC_CTRL_RELAY_ChangeState(Relay_Typedef *Relay_local);
 void DPC_Relay_Init(Relay_Typedef *Relay_local);
-void DPC_LPCNTRL_Burst_Mode(uint32_t* p_Data_Sub,BURST_STRUCT *BURST_CTRL_f,uint32_t* iDC_Data_Sub,DPC_PWM_TypeDef *tDPC_PWM_loc);
-INRUSH_StatusTypeDef DPC_LPCNTRL_Inrush_Check(uint32_t* p_Data_Sub,uint32_t* iDC_Data_Sub,INRUSH_STRUCT *INRUSH_CTRL_f);
+//void DPC_LPCNTRL_Burst_Mode(uint32_t* p_Data_Sub,BURST_STRUCT *BURST_CTRL_f,uint16_t I_load_Burst/*uint32_t* iDC_Data_Sub*/,DPC_PWM_TypeDef *tDPC_PWM_loc);
+void DPC_LPCNTRL_Burst_Mode(uint32_t* p_Data_Sub,BURST_STRUCT *BURST_CTRL_f,CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_NORM_Sub/*uint32_t* iDC_Data_Sub*/,DPC_PWM_TypeDef *tDPC_PWM_loc,DMA_PWMDUTY_STRUCT* DMA_SOURCE);
+//INRUSH_StatusTypeDef DPC_LPCNTRL_Inrush_Check(uint32_t* p_Data_Sub,uint32_t* iDC_Data_Sub,INRUSH_STRUCT *INRUSH_CTRL_f);
+INRUSH_StatusTypeDef DPC_LPCNTRL_Inrush_Check(uint32_t* p_Data_Sub,CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_NORM_Sub/* uint32_t* iDC_Data_Sub*/,INRUSH_STRUCT *INRUSH_CTRL_f);
+
 void DPC_LPCNTRL_Inrush_Init(INRUSH_STRUCT *INRUSH_CTRL_f,uint16_t Vref_hist_VOLT_loc,uint16_t delta_Vref_hist_VOLT_loc,float I_dc_NO_LOAD_Limit_AMP_loc,FlagStatus InrushEnable_loc,DPC_ADC_Conf_TypeDef *DPC_ADC_Conf_loc);
-void DPC_LPCNTRL_PFC_Init(PFC_CTRL_t *pPFC_CTRL,PFC_CTRL_State_TypeDef PFC_CTRL_State,uint16_t PFC_VDC_Ref_loc,DPC_ADC_Conf_TypeDef *DPC_ADC_Conf_loc);
+void DPC_LPCNTRL_PFC_Init(PFC_CTRL_t *pPFC_CTRL_loc,PFC_CTRL_State_TypeDef PFC_CTRL_State,uint16_t PFC_VDC_Ref_loc,DPC_ADC_Conf_TypeDef *DPC_ADC_Conf_loc);
+//void DPC_LPCNTRL_PFC_Init(PFC_CTRL_t *pPFC_CTRL_loc,PFC_CTRL_State_TypeDef PFC_CTRL_State,uint16_t PFC_VDC_Ref_loc,DPC_ADC_Conf_TypeDef *DPC_ADC_Conf_loc);
 #endif /*__DPC_LOOPCTR.H */

@@ -69,4 +69,6 @@ void ADC_Current_DC_ProcessData(uint32_t*, CurrentDC_ADC_NORM_Struct_t*);
 void ADC2Phy_DC_Current_ProcessData(DPC_ADC_Conf_TypeDef *DPC_ADC_Conf,uint32_t* p_Data_Sub, CurrentDC_ADC_NORM_Struct_t* CURRENT_ADC_DC_IN_NORM_Sub);
 void DPC_ADC_Init(DPC_ADC_Conf_TypeDef *DPC_ADC_Conf,float G_Vac,float B_Vac,float G_Iac,float B_Iac,float G_Vdc,float B_Vdc,float G_Idc,float B_Idc);
 void DPC_ADC_Default_Init();
+void Current_DC_Calc(VoltageDC_ADC_NORM_Struct* VOLTAGE_ADC_DC_IN_NORM_Sub, VoltageAC_ADC_NORM_Struct* VOLTAGE_ADC_AC_IN_NORM_Sub,
+			VoltageAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_NORM_Sub, CurrentDC_ADC_NORM_Struct_t* CURRENT_ADC_DC_IN_NORM_Sub);
 #endif

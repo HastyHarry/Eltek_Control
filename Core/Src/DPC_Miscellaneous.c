@@ -367,41 +367,81 @@ void DPC_MISC_Appl_Timer_Start(void)
 
 
 void DPC_MISC_BLED_Set(TIM_HandleTypeDef *htim_bled,uint32_t TIM_CHANNEL_BLED,DPC_BLED_TypeDef State_BLED){
-  switch ( State_BLED){
-  case BLED_Idle:
-    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xB000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);      
-    break;
-  case BLED_StartUp_inrush:
-    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xE000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);      
-    break;
-  case BLED_Fault:
-    HAL_Delay(600);
-    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xFFFF);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);      
-    HAL_Delay(600);
-    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xB000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);      
-    break;
-  case BLED_Error:
-    HAL_Delay(100);
-    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xFFFF);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);      
-    HAL_Delay(100);
-    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0x0000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);       
-    break;
-  case BLED_Run:
-    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xFFFF);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);         
-    break; 
-  case BLED_StartUp_burst: 
-    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0x0FFF);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);       
-    break; 
-  case BLED_Stop:
-    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xD000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);             
-    break;
-  case BLED_Debug:
-    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xA000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);             
-    break; 
-  case BLED_Wait:
-    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xC000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);             
-    break;     
-  }  
+//  switch ( State_BLED){
+//  case BLED_Idle:
+//    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xB000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//    break;
+//  case BLED_StartUp_inrush:
+//    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xE000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//    break;
+//  case BLED_Fault:
+//    HAL_Delay(600);
+//    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xFFFF);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//    HAL_Delay(600);
+//    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xB000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//    break;
+//  case BLED_Error:
+//    HAL_Delay(100);
+//    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xFFFF);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//    HAL_Delay(100);
+//    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0x0000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//    break;
+//  case BLED_Run:
+//    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xFFFF);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//    break;
+//  case BLED_StartUp_burst:
+//    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0x0FFF);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//    break;
+//  case BLED_Stop:
+//    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xD000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//    break;
+//  case BLED_Debug:
+//    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xA000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//    break;
+//  case BLED_Wait:
+//    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xC000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//    break;
+//  }
+	  switch ( State_BLED){
+	  case BLED_Idle:
+		  HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_SET);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_RESET);
+		  break;
+//	  case BLED_StartUp_inrush:
+//	    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xE000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//	    break;
+	  case BLED_Fault:
+	    HAL_Delay(600);
+	    HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_SET);
+	    HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_RESET);
+	    HAL_Delay(600);
+	    HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_RESET);
+	    HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_SET);
+	    break;
+	  case BLED_Error:
+		  HAL_Delay(100);
+		  HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_RESET);
+		  HAL_Delay(100);
+		  HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_SET);
+		break;
+	  case BLED_Run:
+		HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_SET);   // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_SET);
+		break;
+	  case BLED_StartUp_burst:
+		  HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_RESET);
+		  break;
+//	  case BLED_Stop:
+//	    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xD000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//	    break;
+//	  case BLED_Debug:
+//	    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xA000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//	    break;
+//	  case BLED_Wait:
+//	    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xC000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+//	    break;
+	  }
 }
 
 
