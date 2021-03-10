@@ -59,6 +59,7 @@ void ADC_Voltage_AC_ProcessData(uint32_t* p_Data_Sub, VoltageAC_ADC_NORM_Struct*
   
 
 
+
 /**
   * @brief  ADC2Phy_Voltage_ProcessData
   * @param  p_Data_Sub ROW DATA
@@ -133,7 +134,21 @@ void ADC_Current_AC_ProcessData(uint32_t* p_Data_Sub, CurrentAC_ADC_NORM_Struct*
   CURRENT_ADC_AC_IN_NORM_Sub->phA=((float)(p_Data_Sub[0])/(float)(1<<11)-1);    //(float)(1<<11)==(2.44140625e-4*2)
   CURRENT_ADC_AC_IN_NORM_Sub->phB=((float)(p_Data_Sub[1])/(float)(1<<11)-1);    //(float)(1<<11)==(2.44140625e-4*2)
   CURRENT_ADC_AC_IN_NORM_Sub->phC=((float)(p_Data_Sub[2])/(float)(1<<11)-1);    //(float)(1<<11)==(2.44140625e-4*2)
+}
 
+/**
+  * @brief  ADC_Current_AC_RAW_ProcessData
+  * @param  p_Data_Sub ROW DATA
+  * @param  CURRENT_ADC_AC_IN_NORM_Sub, cooked Data
+  *
+  * @retval None
+  *
+  * @note Function valid for STM32G4xx microconroller family
+  */
+void ADC_Current_AC_RAW_ProcessData(uint32_t* p_Data_Sub, CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_NORM_Sub){
+  CURRENT_ADC_AC_IN_NORM_Sub->phA=((float)(p_Data_Sub[0]));    //
+  CURRENT_ADC_AC_IN_NORM_Sub->phB=((float)(p_Data_Sub[1]));    //
+  CURRENT_ADC_AC_IN_NORM_Sub->phC=((float)(p_Data_Sub[2]));    //
 }
 
 
@@ -157,6 +172,83 @@ void ADC2Phy_Current_ProcessData(DPC_ADC_Conf_TypeDef *DPC_ADC_Conf,uint32_t* p_
   CURRENT_ADC_AC_IN_NORM_Sub->phA=((float)((int16_t)p_Data_Sub[0]-B_Iac)*(float)(invG_Iac));    
   CURRENT_ADC_AC_IN_NORM_Sub->phB=((float)((int16_t)p_Data_Sub[1]-B_Iac)*(float)(invG_Iac));    
   CURRENT_ADC_AC_IN_NORM_Sub->phC=((float)((int16_t)p_Data_Sub[2]-B_Iac)*(float)(invG_Iac));    
+}
+
+/**
+  * @brief  ADC2Phy_Current_ProcessData
+  * @param  p_Data_Sub ROW DATA
+  * @param  CURRENT_ADC_AC_IN_Phy_Sub, cooked Data
+  *
+  * @retval None
+  *
+  * @note Function valid for STM32G4xx microconroller family
+  */
+void ADC2Phy_RMS_Current_ProcessData(CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_PHY,CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_PHY_MIN, CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_PHY_MAX, CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_PHY_RMS, uint32_t* Period_ADR){
+
+	float SQRT_TWO;
+	uint32_t Period;
+
+	Period = *Period_ADR;
+	SQRT_TWO = 1.41;
+
+	if (Period==0){
+		CURRENT_ADC_AC_IN_PHY_MAX->phA = 0;
+		CURRENT_ADC_AC_IN_PHY_MAX->phB = 0;
+		CURRENT_ADC_AC_IN_PHY_MAX->phC = 0;
+
+		CURRENT_ADC_AC_IN_PHY_MIN->phA = 0;
+		CURRENT_ADC_AC_IN_PHY_MIN->phB = 0;
+		CURRENT_ADC_AC_IN_PHY_MIN->phC = 0;
+	}
+
+	if (CURRENT_ADC_AC_IN_PHY->phA >  CURRENT_ADC_AC_IN_PHY_MAX->phA){
+	  CURRENT_ADC_AC_IN_PHY_MAX->phA = CURRENT_ADC_AC_IN_PHY->phA;
+	}
+	if (CURRENT_ADC_AC_IN_PHY->phA <  CURRENT_ADC_AC_IN_PHY_MIN->phA){
+	  CURRENT_ADC_AC_IN_PHY_MIN->phA = CURRENT_ADC_AC_IN_PHY->phA;
+	}
+
+  	if (CURRENT_ADC_AC_IN_PHY->phB >  CURRENT_ADC_AC_IN_PHY_MAX->phB){
+	  CURRENT_ADC_AC_IN_PHY_MAX->phB = CURRENT_ADC_AC_IN_PHY->phB;
+	}
+	if (CURRENT_ADC_AC_IN_PHY->phB <  CURRENT_ADC_AC_IN_PHY_MIN->phB){
+	  CURRENT_ADC_AC_IN_PHY_MIN->phB = CURRENT_ADC_AC_IN_PHY->phB;
+	}
+
+    if (CURRENT_ADC_AC_IN_PHY->phC >  CURRENT_ADC_AC_IN_PHY_MAX->phC){
+	  CURRENT_ADC_AC_IN_PHY_MAX->phC = CURRENT_ADC_AC_IN_PHY->phC;
+	}
+	if (CURRENT_ADC_AC_IN_PHY->phC <  CURRENT_ADC_AC_IN_PHY_MIN->phC){
+	  CURRENT_ADC_AC_IN_PHY_MIN->phC = CURRENT_ADC_AC_IN_PHY->phC;
+	}
+
+	Period++;
+	if (Period>=200) {
+		Period=0;
+
+		if (CURRENT_ADC_AC_IN_PHY_MAX->phA > - CURRENT_ADC_AC_IN_PHY_MIN->phA ){
+			CURRENT_ADC_AC_IN_PHY_RMS->phA = (float) (CURRENT_ADC_AC_IN_PHY_MAX->phA / SQRT_TWO);
+		}
+		else {
+			CURRENT_ADC_AC_IN_PHY_RMS->phA = (float) (-CURRENT_ADC_AC_IN_PHY_MIN->phA / SQRT_TWO);
+		}
+
+		if (CURRENT_ADC_AC_IN_PHY_MAX->phB > - CURRENT_ADC_AC_IN_PHY_MIN->phB ){
+			CURRENT_ADC_AC_IN_PHY_RMS->phB = (float) (CURRENT_ADC_AC_IN_PHY_MAX->phB / SQRT_TWO);
+		}
+		else {
+			CURRENT_ADC_AC_IN_PHY_RMS->phB = (float) (-CURRENT_ADC_AC_IN_PHY_MIN->phB / SQRT_TWO);
+		}
+
+		if (CURRENT_ADC_AC_IN_PHY_MAX->phC > - CURRENT_ADC_AC_IN_PHY_MIN->phC ){
+			CURRENT_ADC_AC_IN_PHY_RMS->phC = (float) (CURRENT_ADC_AC_IN_PHY_MAX->phC / SQRT_TWO);
+		}
+		else {
+			CURRENT_ADC_AC_IN_PHY_RMS->phC = (float) (-CURRENT_ADC_AC_IN_PHY_MIN->phC / SQRT_TWO);
+		}
+
+	}
+	*Period_ADR=Period;
 }
 
 

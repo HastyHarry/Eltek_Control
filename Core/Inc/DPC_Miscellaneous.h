@@ -180,7 +180,8 @@ DPC_Load_Status_TypeDef DPC_Load_Status;/*!< */
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-DPC_Load_Status_TypeDef DPC_MISC_Check_DCLoad(DPC_Load_TypeDef *DPC_Load_loc,DPC_Load_Limit_TypeDef DC_Load_Limit_sub);
+//DPC_Load_Status_TypeDef DPC_MISC_Check_DCLoad(DPC_Load_TypeDef *DPC_Load_loc,DPC_Load_Limit_TypeDef DC_Load_Limit_sub);
+DPC_Load_Status_TypeDef DPC_MISC_Check_DCLoad(DPC_Load_TypeDef *DPC_Load_loc,DPC_Load_Limit_TypeDef DC_Load_Limit_sub, CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_NORM_Sub);
 DPC_Source_Status_TypeDef DPC_MISC_CHECK_AC_SOURCE(DPC_Source_TypeDef *AC_Source_sub,DPC_Source_Limit_TypeDef AC_Source_Limit_sub,float Theta);
 void DPC_MISC_ACSource_Init(DPC_Source_Limit_TypeDef *AC_Source_Limit_sub,uint16_t V_ac_Limit_VOLT,uint16_t V_ac_UV_Limit_VOLT,uint16_t V_ac_UVLO_Limit_VOLT,uint16_t V_ac_Low_Limit_VOLT,uint16_t I_ac_Limit_AMP,DPC_ADC_Conf_TypeDef *DPC_ADC_Conf_loc);
 DPC_Status_Plug_ACSource_TypeDef DPC_MISC_AC_SOURCE_Plugged(DPC_Source_Limit_TypeDef AC_Source_Limit_sub);

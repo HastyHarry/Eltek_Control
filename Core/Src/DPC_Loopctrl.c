@@ -473,8 +473,8 @@ void DPC_LPCNTRL_Burst_Mode(uint32_t* p_Data_Sub,BURST_STRUCT *BURST_CTRL_f,Curr
 	I_min = CURRENT_ADC_AC_IN_NORM_Sub->phC;
   }
 
-  I_min_int = (uint16_t) I_min;
-  I_max_int = (uint16_t) I_max;
+  I_min_int = (int16_t) (I_min*10);
+  I_max_int = (int16_t) (I_max*10);
 
   if (-I_min_int > I_max_int){
 	  I_max_int= -I_min_int;
@@ -579,8 +579,8 @@ INRUSH_StatusTypeDef DPC_LPCNTRL_Inrush_Check(uint32_t* p_Data_Sub,CurrentAC_ADC
 	  I_min = CURRENT_ADC_AC_IN_NORM_Sub->phC;
   }
 
-  I_min_int = (int16_t) I_min;
-  I_max_int = (int16_t) I_max;
+  I_min_int = (int16_t) (I_min*10);
+  I_max_int = (int16_t) (I_max*10);
 
   if (-I_min_int > I_max_int){
 	  I_max_int= -I_min_int;

@@ -69,20 +69,55 @@
 * @note Function valid for STM32G4xx and STM32F74x microconroller family   
 */
 
-DPC_Load_Status_TypeDef DPC_MISC_Check_DCLoad(DPC_Load_TypeDef *DPC_Load_loc,DPC_Load_Limit_TypeDef DC_Load_Limit_sub)
+DPC_Load_Status_TypeDef DPC_MISC_Check_DCLoad(DPC_Load_TypeDef *DPC_Load_loc,DPC_Load_Limit_TypeDef DC_Load_Limit_sub, CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_NORM_Sub)
 {
 
   uint16_t VDC;
   VoltageDC_ADC_Struct* DATA_VDC;  
   CurrentDC_ADC_Struct* DATA_IDC;
   
+  float I_max;
+  float I_min;
+  int16_t I_max_int;
+  int16_t I_min_int;
+
+
   DATA_VDC =  Read_Volt_DC(); 
-  DATA_IDC = Read_Curr_DC(); 
+  //DATA_IDC = Read_Curr_DC();
   
   VDC=DATA_VDC->Vdc_pos+DATA_VDC->Vdc_neg;
   
   DPC_Load_Status_TypeDef Load_Status;
  
+
+
+   if (I_max < CURRENT_ADC_AC_IN_NORM_Sub->phA){
+ 	  I_max = CURRENT_ADC_AC_IN_NORM_Sub->phA;
+   }
+   if (I_max < CURRENT_ADC_AC_IN_NORM_Sub->phB){
+   	  I_max = CURRENT_ADC_AC_IN_NORM_Sub->phB;
+     }
+   if (I_max < CURRENT_ADC_AC_IN_NORM_Sub->phC){
+   	  I_max = CURRENT_ADC_AC_IN_NORM_Sub->phC;
+   }
+
+   if (I_min > CURRENT_ADC_AC_IN_NORM_Sub->phA){
+ 	  I_min = CURRENT_ADC_AC_IN_NORM_Sub->phA;
+   }
+   if (I_min < CURRENT_ADC_AC_IN_NORM_Sub->phB){
+ 	  I_min = CURRENT_ADC_AC_IN_NORM_Sub->phB;
+   }
+   if (I_min < CURRENT_ADC_AC_IN_NORM_Sub->phC){
+ 	I_min = CURRENT_ADC_AC_IN_NORM_Sub->phC;
+   }
+
+   I_min_int = (int16_t) (I_min*10);
+   I_max_int = (int16_t) (I_max*10);
+
+   if (-I_min_int > I_max_int){
+ 	  I_max_int= -I_min_int;
+   }
+
   
   if((DATA_VDC->Vdc_pos > DC_Load_Limit_sub.V_cap_Limit) || (DATA_VDC->Vdc_neg > DC_Load_Limit_sub.V_cap_Limit)){  
     DPC_PWM_OutDisable();                                                                   ///Safe: Disable PWM outputs if enabled
@@ -97,24 +132,29 @@ DPC_Load_Status_TypeDef DPC_MISC_Check_DCLoad(DPC_Load_TypeDef *DPC_Load_loc,DPC
     DPC_FLT_Faulterror_Set(FAULT_OVL);
   }
   else {
-    if(DATA_IDC->IDC_adc>=DC_Load_Limit_sub.I_Over_load_Threshold)
+    //if(DATA_IDC->IDC_adc>=DC_Load_Limit_sub.I_Over_load_Threshold)
+    if(I_max_int>=DC_Load_Limit_sub.I_Over_load_Threshold)
     {
       Load_Status=OVERCURRENT_LOAD;
       DPC_FLT_Faulterror_Set(FAULT_OCL);       
     }
-    else if(DATA_IDC->IDC_adc>=DC_Load_Limit_sub.I_Low_load_Max_Threshold && (DPC_Load_loc->DPC_Load_Status==LOW_LOAD || DPC_Load_loc->DPC_Load_Status==NO_LOAD))
+    //else if(DATA_IDC->IDC_adc>=DC_Load_Limit_sub.I_Low_load_Max_Threshold && (DPC_Load_loc->DPC_Load_Status==LOW_LOAD || DPC_Load_loc->DPC_Load_Status==NO_LOAD))
+    else if(I_max_int>=DC_Load_Limit_sub.I_Low_load_Max_Threshold && (DPC_Load_loc->DPC_Load_Status==LOW_LOAD || DPC_Load_loc->DPC_Load_Status==NO_LOAD))
     {
       Load_Status=ON_LOAD;
     }
-    else if(DATA_IDC->IDC_adc<=DC_Load_Limit_sub.I_Low_load_Min_Threshold && (DPC_Load_loc->DPC_Load_Status==ON_LOAD))
+    //else if(DATA_IDC->IDC_adc<=DC_Load_Limit_sub.I_Low_load_Min_Threshold && (DPC_Load_loc->DPC_Load_Status==ON_LOAD))
+    else if(I_max_int<=DC_Load_Limit_sub.I_Low_load_Min_Threshold && (DPC_Load_loc->DPC_Load_Status==ON_LOAD))
     {
       Load_Status=LOW_LOAD;
     }
-    else if(DATA_IDC->IDC_adc>=DC_Load_Limit_sub.I_No_load_Max_Threshold && (DPC_Load_loc->DPC_Load_Status==NO_LOAD))
+    //else if(DATA_IDC->IDC_adc>=DC_Load_Limit_sub.I_No_load_Max_Threshold && (DPC_Load_loc->DPC_Load_Status==NO_LOAD))
+    else if(I_max_int>=DC_Load_Limit_sub.I_No_load_Max_Threshold && (DPC_Load_loc->DPC_Load_Status==NO_LOAD))
     {
       Load_Status=LOW_LOAD;
     }
-    else if(DATA_IDC->IDC_adc<=DC_Load_Limit_sub.I_No_load_Min_Threshold)
+    //else if(DATA_IDC->IDC_adc<=DC_Load_Limit_sub.I_No_load_Min_Threshold)
+    else if(I_max_int<=DC_Load_Limit_sub.I_No_load_Min_Threshold)
     {
       Load_Status=NO_LOAD;
     }
@@ -162,15 +202,26 @@ void DPC_MISC_DCLoad_Init(DPC_Load_Limit_TypeDef *DC_Load_Limit_sub,uint16_t V_d
   V_cap_Limit_loc=(uint16_t)(((float)V_cap_Limit_VOLT*DPC_ADC_Conf_loc->G_Vdc)+DPC_ADC_Conf_loc->B_Vdc);                                        /// (Vcap_limit_Threshold [Volt] * DC Voltage Sensing Gain) + DC Voltage Sensing Bias 
   V_dc_Limit_loc=(uint16_t)(((float)V_dc_Limit_VOLT*DPC_ADC_Conf_loc->G_Vdc)+DPC_ADC_Conf_loc->B_Vdc);                                          /// (Vdc_limit_Threshold [Volt] * DC Voltage Sensing Gain) + DC Voltage Sensing Bias
 
-  I_dc_NO_LOAD_Limit_loc=(uint16_t)(((float)I_dc_NO_LOAD_Limit_AMP*DPC_ADC_Conf_loc->G_Idc)+DPC_ADC_Conf_loc->B_Idc);                           /// (IDC_No_LOAD_Threshold [Ampere] * DC Current Sensing Gain) + DC Current Sensing Bias
-  I_dc_NO_LOAD_Delta_Limit_loc=(uint16_t)((I_dc_NO_LOAD_Limit_loc - DPC_ADC_Conf_loc->B_Idc)*((float)DPC_NO_LOAD_DELTA_CURR*0.01));                     ///
-  I_dc_NO_LOAD_Max_Limit_loc=(uint16_t)(I_dc_NO_LOAD_Limit_loc + I_dc_NO_LOAD_Delta_Limit_loc);                                                 /// 
-  I_dc_NO_LOAD_Min_Limit_loc=(uint16_t)(I_dc_NO_LOAD_Limit_loc - I_dc_NO_LOAD_Delta_Limit_loc);                                                 /// 
+//  I_dc_NO_LOAD_Limit_loc=(uint16_t)(((float)I_dc_NO_LOAD_Limit_AMP*DPC_ADC_Conf_loc->G_Idc)+DPC_ADC_Conf_loc->B_Idc);                           /// (IDC_No_LOAD_Threshold [Ampere] * DC Current Sensing Gain) + DC Current Sensing Bias
+//  I_dc_NO_LOAD_Delta_Limit_loc=(uint16_t)((I_dc_NO_LOAD_Limit_loc - DPC_ADC_Conf_loc->B_Idc)*((float)DPC_NO_LOAD_DELTA_CURR*0.01));                     ///
+//  I_dc_NO_LOAD_Max_Limit_loc=(uint16_t)(I_dc_NO_LOAD_Limit_loc + I_dc_NO_LOAD_Delta_Limit_loc);                                                 ///
+//  I_dc_NO_LOAD_Min_Limit_loc=(uint16_t)(I_dc_NO_LOAD_Limit_loc - I_dc_NO_LOAD_Delta_Limit_loc);
 
-  I_dc_LOW_LOAD_Limit_loc=(uint16_t)(((float)I_dc_LOW_LOAD_Limit_AMP*DPC_ADC_Conf_loc->G_Idc)+DPC_ADC_Conf_loc->B_Idc);                         /// (IDC_Light_LOAD_Threshold [Ampere] * DC Current Sensing Gain) + DC Current Sensing Bias
-  I_dc_LOW_LOAD_Delta_Limit_loc=(uint16_t)((I_dc_LOW_LOAD_Limit_loc - DPC_ADC_Conf_loc->B_Idc)*((float)DPC_LOW_LOAD_DELTA_CURR*0.01));                   ///
+  I_dc_NO_LOAD_Limit_loc=(uint16_t)(float)I_dc_NO_LOAD_Limit_AMP;                           /// (IDC_No_LOAD_Threshold [Ampere] * DC Current Sensing Gain) + DC Current Sensing Bias
+  I_dc_NO_LOAD_Delta_Limit_loc=(uint16_t)(I_dc_NO_LOAD_Limit_loc)*((float)DPC_NO_LOAD_DELTA_CURR*0.01);                     ///
+  I_dc_NO_LOAD_Max_Limit_loc=(uint16_t)(I_dc_NO_LOAD_Limit_loc + I_dc_NO_LOAD_Delta_Limit_loc);                                                 /// 
+  I_dc_NO_LOAD_Min_Limit_loc=(uint16_t)(I_dc_NO_LOAD_Limit_loc - I_dc_NO_LOAD_Delta_Limit_loc);
+
+
+//  I_dc_LOW_LOAD_Limit_loc=(uint16_t)(((float)I_dc_LOW_LOAD_Limit_AMP*DPC_ADC_Conf_loc->G_Idc)+DPC_ADC_Conf_loc->B_Idc);                         /// (IDC_Light_LOAD_Threshold [Ampere] * DC Current Sensing Gain) + DC Current Sensing Bias
+//  I_dc_LOW_LOAD_Delta_Limit_loc=(uint16_t)((I_dc_LOW_LOAD_Limit_loc - DPC_ADC_Conf_loc->B_Idc)*((float)DPC_LOW_LOAD_DELTA_CURR*0.01));                   ///
+//  I_dc_LOW_LOAD_Max_Limit_loc=(uint16_t)(I_dc_LOW_LOAD_Limit_loc + I_dc_LOW_LOAD_Delta_Limit_loc);                                               ///
+//  I_dc_LOW_LOAD_Min_Limit_loc=(uint16_t)(I_dc_LOW_LOAD_Limit_loc - I_dc_LOW_LOAD_Delta_Limit_loc);
+
+  I_dc_LOW_LOAD_Limit_loc=(uint16_t)((float)I_dc_LOW_LOAD_Limit_AMP);                         /// (IDC_Light_LOAD_Threshold [Ampere] * DC Current Sensing Gain) + DC Current Sensing Bias
+  I_dc_LOW_LOAD_Delta_Limit_loc=(uint16_t)((I_dc_LOW_LOAD_Limit_loc)*(float)DPC_LOW_LOAD_DELTA_CURR*0.01);                   ///
   I_dc_LOW_LOAD_Max_Limit_loc=(uint16_t)(I_dc_LOW_LOAD_Limit_loc + I_dc_LOW_LOAD_Delta_Limit_loc);                                               /// 
-  I_dc_LOW_LOAD_Min_Limit_loc=(uint16_t)(I_dc_LOW_LOAD_Limit_loc - I_dc_LOW_LOAD_Delta_Limit_loc);                                               /// 
+  I_dc_LOW_LOAD_Min_Limit_loc=(uint16_t)(I_dc_LOW_LOAD_Limit_loc - I_dc_LOW_LOAD_Delta_Limit_loc); ///
 
   I_dc_OVER_LOAD_Limit_loc=(uint16_t)(((float)I_dc_OVER_LOAD_Limit_AMP*DPC_ADC_Conf_loc->G_Idc)+DPC_ADC_Conf_loc->B_Idc);                       /// (IDC_Over_LOAD_Threshold [Ampere] * DC Current Sensing Gain) + DC Current Sensing Bias   
   
@@ -284,6 +335,16 @@ void DPC_MISC_APPL_Timer_Init(TIM_HandleTypeDef AppTIM, uint32_t  APPL_Freq_Desi
   if (HAL_TIM_Base_Init(&AppTIM) != HAL_OK){Error_Handler();}                           ///Init Task Timer  
  
 } 
+
+/**
+* @brief  DPC_MISC_APPL_Timer_Init: Initialize the Application timer tu the period desidered
+*
+* @param AppTIM: Timer to initialize.
+* @param APPL_Freq_Desidered: Value of frequency desidered
+* @retval None
+*
+* @note Function valid for STM32G4xx and STM32F74x microconroller family
+*/
 
 
 
@@ -404,33 +465,33 @@ void DPC_MISC_BLED_Set(TIM_HandleTypeDef *htim_bled,uint32_t TIM_CHANNEL_BLED,DP
 //  }
 	  switch ( State_BLED){
 	  case BLED_Idle:
-		  HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_SET);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_RESET);
+		  //HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_SET);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
+		  //HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_RESET);
 		  break;
 //	  case BLED_StartUp_inrush:
 //	    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xE000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
 //	    break;
 	  case BLED_Fault:
-	    HAL_Delay(600);
+//	    HAL_Delay(600);
 	    HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_SET);
-	    HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_RESET);
-	    HAL_Delay(600);
-	    HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_RESET);
+//	    HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_RESET);
+//	    HAL_Delay(600);
+//	    HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_RESET);
 	    HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_SET);
 	    break;
 	  case BLED_Error:
-		  HAL_Delay(100);
-		  HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_RESET);
-		  HAL_Delay(100);
+//		  HAL_Delay(100);
 		  HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_SET);
+//		  HAL_Delay(100);
+		  HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_SET);
 		break;
 	  case BLED_Run:
 		HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_SET);   // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_RESET);
 		break;
 	  case BLED_StartUp_burst:
 		  HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(GPIOA, LED_HL2_Pin, GPIO_PIN_SET);
 		  break;
 //	  case BLED_Stop:
 //	    __HAL_TIM_SET_COMPARE(htim_bled, TIM_CHANNEL_BLED, 0xD000);  // 0xB000 = Orange 0x0000 = Red  0xFFFF = Green//      HAL_GPIO_WritePin(Status_LED_GPIO_Port, Status_LED_Pin, GPIO_PIN_SET);

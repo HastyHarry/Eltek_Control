@@ -74,6 +74,9 @@ uint32_t Flag2;
 uint16_t Relay_State;
 uint32_t Timeout[5];
 TO_RET_STATE TO_State;
+TO_RET_STATE TO_State2;
+float ADC_AC_Current[3][200];
+uint32_t Period_Counter;
 
 /*!FSM*/
 PC_State_TypeDef PC_State;                                      /*!< */
@@ -150,6 +153,10 @@ VoltageDC_ADC_NORM_Struct VOLTAGE_ADC_DC_IN_BITS;               /*!< DC Voltage 
 CurrentDC_ADC_NORM_Struct_t CURRENT_ADC_DC_IN_NORM;             /*!< DC Current sensing ADC value expressed in [-1,1] */
 CurrentDC_ADC_NORM_Struct_t CURRENT_ADC_DC_IN_PHY;              /*!< DC Current sensing ADC value expressed in [Ampere] */
 CurrentDC_ADC_NORM_Struct_t CURRENT_ADC_DC_IN_BITS;             /*!< DC Current sensing ADC value expressed in [ADC_12bits] */
+
+CurrentAC_ADC_NORM_Struct CURRENT_ADC_AC_IN_PHY_MAX;
+CurrentAC_ADC_NORM_Struct CURRENT_ADC_AC_IN_PHY_MIN;
+CurrentAC_ADC_NORM_Struct CURRENT_ADC_AC_IN_PHY_RMS;
 
 /*!Control Loop variables*/
 PFC_CTRL_t  pPFC_CTRL;                                          /*!< */
@@ -241,6 +248,7 @@ int main(void)
   DPC_MISC_APPL_Timer_Init(APPL_Tim2, RefreshTime_TO_DESIDERED);                                                                                                                                        /// Function used to Init the timers APP_TIM1 (htim3) used in the power application
   DPC_MISC_APPL_Timer_Init(APPL_Tim3, RefreshTime2_DESIDERED);
 
+
   DPC_MISC_Analog_Start();
 
   DPC_PLL_Init(&PLL_CONVERTER,PLL_KP, PLL_KI, DPC_PLL_TS,PLL_PHI_2pi,PLL_DELTA_F,PLL_FF_Hz,DPC_PLL_SAT_EN,DPC_PLL_PIsat_up,DPC_PLL_PIsat_down);                                                         /// INIT PLL
@@ -276,7 +284,6 @@ int main(void)
 	  DPC_FSM_Application();
 	  //DPC_PWM_OutEnable(&tDPC_PWM);
 	  //HAL_HRTIM_SimplePWMStart(&hhrtim1, &PWM_Tim1, HRTIM_OUTPUT_TA1);
-
   }
   /* USER CODE END 3 */
 }
@@ -392,7 +399,9 @@ bool DPC_FSM_IDLE_Func(void)
       if(Status_Load==NO_LOAD){
         DPC_PWM_OutDisable();
         //      if(HAL_GPIO_ReadPin(USR_BTN_GPIO_Port, USR_BTN_Pin)){
-        DPC_FSM_State_Set(DPC_FSM_INIT);
+        if (VOLTAGE_ADC_DC_IN_PHY.Vdc_tot > DPC_VDC){
+        	DPC_FSM_State_Set(DPC_FSM_INIT);
+        }
         //      }
       }
 
@@ -419,8 +428,8 @@ bool DPC_FSM_INIT_Func(void)
 
   //DPC_MISC_BLED_Set(&DPC_BLED_TIM,DPC_BLED_CH,BLED_StartUp_inrush);                                                             ///DPC Bicolor LED SET to FSM_StartUp_inrush
   DPC_PWM_OutDisable();
-  if (!Relay_State && Status_Source==OK_SOURCE){
-	  TO_State=DPC_TO_Check(0);
+  if (!Relay_State && Status_Source==OK_SOURCE ){
+	  TO_State=DPC_TO_Check(RELAY_TO_CH);
 	  if (TO_State==TO_OUT_TOOK){
 		  Relay_State = 1;
 		  HAL_GPIO_WritePin(GPIOA, Relay_Pin, GPIO_PIN_SET);
@@ -429,7 +438,7 @@ bool DPC_FSM_INIT_Func(void)
 
 	  }
 	  else{
-		  DPC_TO_Set(0, RELAY_TIMEOUT);
+		  DPC_TO_Set(RELAY_TO_CH, RELAY_TIMEOUT);
 	  }
   }
   else if(Status_Source==OK_SOURCE && Relay_State){
@@ -440,8 +449,9 @@ bool DPC_FSM_INIT_Func(void)
 //    DPC_MISC_RELAY_Cntl(RELAY_SER_1, RELAY_OFF);                                                                            ///Insert Inrush current resistor opening the Inrush relays
 
     if (INRUSH_State==INRUSH_Disable){
-      PC_State=FSM_StartUp_burst;
-      DPC_FSM_State_Set(DPC_FSM_START);
+		PC_State=FSM_StartUp_burst;
+		DPC_FSM_State_Set(DPC_FSM_START);
+
 //      DPC_MISC_RELAY_Cntl(RELAY_SER_1, RELAY_ON);                                                                           /// Bypass Resistors of the inrush current limiter
     }
     else {
@@ -457,6 +467,9 @@ bool DPC_FSM_INIT_Func(void)
     	DPC_FLT_Error_Reset(ERROR_PFC_UVLO);
       }
       else if(INRUSH_State==INRUSH_Complete){
+
+
+
         PC_State=FSM_StartUp_burst;
         //DPC_MISC_RELAY_Cntl(RELAY_SER_1, RELAY_ON);                                                                         /// Bypass Resistors of the inrush current limiter
         DPC_FLT_Error_Reset(ERROR_PFC_UVLO);
@@ -490,39 +503,50 @@ bool DPC_FSM_START_Func(void)
 {
   bool RetVal = true;
 
-  DPC_MISC_BLED_Set(&DPC_BLED_TIM,DPC_BLED_CH,BLED_StartUp_burst);                                                      ///DPC Bicolor LED SET to FSM_StartUp_burst
-//  HAL_GPIO_WritePin(FAN_GPIO_Port, FAN_Pin, GPIO_PIN_SET);                                                              ///
+  TO_State=DPC_TO_Check(FSM_START_TO_CH);
+  if (TO_State==TO_OUT_TOOK){
+	  DPC_MISC_BLED_Set(&DPC_BLED_TIM,DPC_BLED_CH,BLED_StartUp_burst);                                                      ///DPC Bicolor LED SET to FSM_StartUp_burst
+	//  HAL_GPIO_WritePin(FAN_GPIO_Port, FAN_Pin, GPIO_PIN_SET);                                                              ///
 
-  if(Status_Source==NO_SOURCE){
-	  DPC_FLT_Faulterror_Set(ERROR_AC_OFF);
-	  DPC_FSM_State_Set(DPC_FSM_ERROR);
-  }
-  if(BURST_State==BURST_Start){
-    //future check here
-    BURST_State=BURST_Progress;
-    DPC_FLT_Error_Reset(ERROR_PFC_UVLO);
-  }
-  else if(BURST_State==BURST_Progress){
-    //BURST_State=DPC_LPCNTRL_Burst_Check((uint32_t*)Read_Volt_DC(),(uint32_t*)Read_Curr_DC(),&STARTBURST_CTRL);        ///Burst Check for the FSM
-	  BURST_State=DPC_LPCNTRL_Burst_Check((uint32_t*)Read_Volt_DC(),&CURRENT_ADC_AC_IN_PHY,&STARTBURST_CTRL);
+	  if(Status_Source==NO_SOURCE){
+		  DPC_FLT_Faulterror_Set(ERROR_AC_OFF);
+		  DPC_FSM_State_Set(DPC_FSM_ERROR);
+	  }
+	  if(BURST_State==BURST_Start){
+	    //future check here
+	    BURST_State=BURST_Progress;
+	    DPC_FLT_Error_Reset(ERROR_PFC_UVLO);
+	  }
+	  else if(BURST_State==BURST_Progress){
+	    //BURST_State=DPC_LPCNTRL_Burst_Check((uint32_t*)Read_Volt_DC(),(uint32_t*)Read_Curr_DC(),&STARTBURST_CTRL);        ///Burst Check for the FSM
+		  BURST_State=DPC_LPCNTRL_Burst_Check((uint32_t*)Read_Volt_DC(),&CURRENT_ADC_AC_IN_PHY_RMS,&STARTBURST_CTRL);
 
-	  DPC_FLT_Error_Reset(ERROR_PFC_UVLO);
+		  DPC_FLT_Error_Reset(ERROR_PFC_UVLO);
+	  }
+	  else if(BURST_State==BURST_Complete){
+	    DPC_FLT_Error_Reset(ERROR_PFC_UVLO);
+	    PC_State=FSM_Run;
+	    DPC_FSM_State_Set(DPC_FSM_RUN);
+	    DPC_PWM_OutDisable();
+	  }
+	  else if(BURST_State==BURST_Error){
+	    RetVal = false;
+	    DPC_FSM_State_Set(DPC_FSM_STOP);
+	    //      DPC_FLT_Faulterror_Set(ERROR_BRS);
+	    DPC_FLT_Faulterror_Set(FAULT_BRS);
+	  }
+	  else if(BURST_State==BURST_Disable){
+	    DPC_FSM_State_Set(DPC_FSM_RUN);
+	  }
   }
-  else if(BURST_State==BURST_Complete){
-    DPC_FLT_Error_Reset(ERROR_PFC_UVLO);
-    PC_State=FSM_Run;
-    DPC_FSM_State_Set(DPC_FSM_RUN);
-    DPC_PWM_OutDisable();
+  else if (TO_State==TO_OUT_OK){
+
   }
-  else if(BURST_State==BURST_Error){
-    RetVal = false;
-    DPC_FSM_State_Set(DPC_FSM_STOP);
-    //      DPC_FLT_Faulterror_Set(ERROR_BRS);
-    DPC_FLT_Faulterror_Set(FAULT_BRS);
+  else{
+	  DPC_TO_Set(FSM_START_TO_CH, FSM_START_TIMEOUT);
   }
-  else if(BURST_State==BURST_Disable){
-    DPC_FSM_State_Set(DPC_FSM_RUN);
-  }
+
+
   return RetVal;
 }
 
@@ -692,10 +716,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 		//start READ variable from DATA LAYER
 		ADC_Current_AC_ProcessData((uint32_t*)Read_Curr_GRID(),&CURRENT_ADC_AC_IN_NORM);                    /// Read Current AC from DATA Layer and pass it at CURRENT_ADC_AC_IN_NORM
+		ADC_Current_AC_RAW_ProcessData((uint32_t*)Read_Curr_GRID(), &CURRENT_ADC_AC_IN_BITS);
+
 		ADC2Phy_Current_ProcessData(&DPC_ADC_Conf,(uint32_t*)Read_Curr_GRID(),&CURRENT_ADC_AC_IN_PHY);      /// Read Current AC from DATA Layer and pass it at CURRENT_ADC_AC_IN_PHY
+		ADC2Phy_RMS_Current_ProcessData(&CURRENT_ADC_AC_IN_PHY, &CURRENT_ADC_AC_IN_PHY_MIN, &CURRENT_ADC_AC_IN_PHY_MAX, &CURRENT_ADC_AC_IN_PHY_RMS, &Period_Counter);
+		//ADC2Phy_MA_Current_ProcessData(&DPC_ADC_Conf,(uint32_t*)Read_Curr_GRID(), &ADC_AC_Current_MA,&CURRENT_ADC_AC_MA_IN_PHY);
+
 		//end READ variable from DATA LAYER
 
-		Status_Load=DPC_MISC_Check_DCLoad(&DPC_Load,DC_Load_Limit);
+		Status_Load=DPC_MISC_Check_DCLoad(&DPC_Load,DC_Load_Limit,&CURRENT_ADC_AC_IN_PHY_RMS);
 		Status_Source=DPC_MISC_CHECK_AC_SOURCE(&AC_SOURCE,AC_Source_Limit,PLL_CONVERTER.pll_theta_out_2pi);  ///Check AC SOURCE state reading AC Voltage and curent
 
 		Iabc_temp=*((TRANSFORM_ABC_t*)&CURRENT_ADC_AC_IN_NORM);                                             /// Sensing Current
@@ -753,7 +782,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			  break;
 		  case Run_Burst_Mode:
 			//DPC_LPCNTRL_Burst_Mode((uint32_t*)Read_Volt_DC(),&BURST_CTRL,(uint32_t*)Read_Curr_DC(),&tDPC_PWM);
-			DPC_LPCNTRL_Burst_Mode((uint32_t*)Read_Volt_DC(),&BURST_CTRL,&CURRENT_ADC_AC_IN_PHY,&tDPC_PWM, &DMA_HRTIM_SRC);
+			DPC_LPCNTRL_Burst_Mode((uint32_t*)Read_Volt_DC(),&BURST_CTRL,&CURRENT_ADC_AC_IN_PHY_RMS,&tDPC_PWM, &DMA_HRTIM_SRC);
 			DPC_LPCNTRL_PFC_Mode_Reset(&pPI_VDC_CTRL,&CDC);
 			break;
 		  case Run_Idle:
@@ -766,7 +795,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		else if (PC_State==FSM_StartUp_burst)                        ///__________FSM_StartUp_burst__________
 		{
 		  //DPC_LPCNTRL_Burst_Mode((uint32_t*)Read_Volt_DC(),&STARTBURST_CTRL,(uint32_t*)Read_Curr_DC(),&tDPC_PWM);
-		  DPC_LPCNTRL_Burst_Mode((uint32_t*)Read_Volt_DC(),&STARTBURST_CTRL,&CURRENT_ADC_AC_IN_PHY,&tDPC_PWM, &DMA_HRTIM_SRC);
+		  DPC_LPCNTRL_Burst_Mode((uint32_t*)Read_Volt_DC(),&STARTBURST_CTRL,&CURRENT_ADC_AC_IN_PHY_RMS,&tDPC_PWM, &DMA_HRTIM_SRC);
 		  DPC_PWM_OutEnable(&tDPC_PWM);
 		  DPC_LPCNTRL_PFC_Mode_Reset(&pPI_VDC_CTRL,&CDC);
 		}
@@ -807,7 +836,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 	else if(htim->Instance == TIM3){
 		TimeoutMng();
-		Timeout[0]++;
+		//Timeout[0]++;
 	}
 	else if(htim->Instance == TIM6){
 
@@ -829,15 +858,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //			if (Flag2==1){
 //				Service_step=0;
 //			}
-
 	}
 
-		Service_data[0][Service_step]=CURRENT_ADC_DC_IN_PHY.IDC_adc;
-//		Service_data[1][Service_step]=VOLTAGE_ADC_AC_IN_NORM.phB;
-//		Service_data[2][Service_step]=VOLTAGE_ADC_AC_IN_NORM.phC;
-//		//Service_data[3][Service_step]=CURRENT_ADC_AC_IN_PHY.phA;
-//		//Service_data[4][Service_step]=CURRENT_ADC_AC_IN_PHY.phB;
-//		//Service_data[5][Service_step]=CURRENT_ADC_AC_IN_PHY.phC;
+		Service_data[0][Service_step]=VOLTAGE_ADC_DC_IN_PHY.Vdc_tot;
+		Service_data[1][Service_step]=CURRENT_ADC_AC_IN_PHY_RMS.phA;
+		Service_data[2][Service_step]=CURRENT_ADC_AC_IN_PHY_RMS.phB;
+		Service_data[3][Service_step]=CURRENT_ADC_AC_IN_PHY_RMS.phC;
+		Service_data[4][Service_step]=CURRENT_ADC_AC_IN_PHY.phA;
+		Service_data[5][Service_step]=CURRENT_ADC_AC_IN_PHY.phB;
+		Service_data[6][Service_step]=CURRENT_ADC_AC_IN_PHY.phC;
 //
 //		Service_data[6][Service_step]=V_ABC_CTRL.axA;
 
@@ -868,12 +897,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 void HAL_HRTIM_Fault1Callback(HRTIM_HandleTypeDef *hhrtim){
 	DPC_FLT_Faulterror_Set(FAULT_OCS);
-	while(1){}
 
 }
 void HAL_HRTIM_Fault3Callback(HRTIM_HandleTypeDef *hhrtim){
 	DPC_FLT_Faulterror_Set(FAULT_OCS);
-	while(1){}
 }
 
 /* USER CODE END 4 */

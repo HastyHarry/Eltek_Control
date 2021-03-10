@@ -244,6 +244,7 @@ void DATA_Acquisition_from_DMA(uint32_t* p_ADC1_Data,uint32_t* p_ADC2_Data)
 //  VDC_ADC.Vdc_neg=p_ADC2_Data[1];
 //#elif STDES_PFCBIDIR_REV2
 
+
 //T_ext=p_ADC2_Data[2];//////
   T_int=p_ADC1_Data[7];//////
   //AC Side Voltage
@@ -254,7 +255,8 @@ void DATA_Acquisition_from_DMA(uint32_t* p_ADC1_Data,uint32_t* p_ADC2_Data)
   IAC_ADC.phA=p_ADC1_Data[0];
   IAC_ADC.phB=p_ADC1_Data[1];
 
-  IAC_ADC.phC = IAC_ADC.phA+IAC_ADC.phB - 2048 ;
+  IAC_ADC.phC = B_IAC - ((IAC_ADC.phA - B_IAC) + (IAC_ADC.phB - B_IAC));
+
 
   //IAC_ADC.phC=p_ADC1_Data[];
   // DC Side Current

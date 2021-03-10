@@ -77,14 +77,15 @@
 #define DPC_VAC_220                                                                     /*!< Nominal AC Input Voltage - (Expressed in VOLT)*/
 //#define DPC_VAC_110                                                                     /*!< Nominal AC Input Voltage - (Expressed in VOLT)*/
 #define DPC_VAC                         180//180                                             /*!< Min AC Input Voltage - (Expressed in VOLT)*/
+#define DPC_VDC                         300//180										/*!< Min DC Voltage to set relays closed*/
 #define DPC_AC_3W                                                                       /*!< 3-WIRE AC Main Connection */
 //#define DPC_AC_4W                                                                       /*!< 4-WIRE AC Main Connection */
 ///DC OUTPUT  DEFINE of STDES-PFCBIDIR
-#define DPC_PFC_VDC_OUT                 500//720                                             /*!< DPC - DC Outout Voltage referance value of the Power converetr [Expresed in Volt]*/
+#define DPC_PFC_VDC_OUT                 700//720                                             /*!< DPC - DC Outout Voltage referance value of the Power converetr [Expresed in Volt]*/
 ///PROTECTION
 #define DPC_VAC_RMS_OV                  400                                             /*!< Over Voltage Limit AC main RMS Value [Expressed in Volts]*/
-#define DPC_VAC_RMS_UVLO                50//150                                             /*!< [Under Voltage Lock Out RMS Value [Expressed in Volts]*/
-#define DPC_VAC_RMS_UV                  30//50                                              /*!< [Under Voltage RMS Value [Expressed in Volts]*/
+#define DPC_VAC_RMS_UVLO                100//150                                             /*!< [Under Voltage Lock Out RMS Value [Expressed in Volts]*/
+#define DPC_VAC_RMS_UV                  50//50                                              /*!< [Under Voltage RMS Value [Expressed in Volts]*/
 
 
 ///_________________________________________________________________________ADV APPLICATION CONFIGURATOR______________________________________
@@ -100,15 +101,15 @@
 
 
 ///DPC START Burst Define of STDES-PFCBIDIR
-#define DPC_STARTBURST_DUTY             0.03                                             /*!< [Expressed in Unit]*/
+#define DPC_STARTBURST_DUTY             0.05                                             /*!< [Expressed in Unit]*/
 #define STARTBURST_VREF_V               DPC_PFC_VDC_OUT                                 /*!< [Expressed in Volts]*/
-#define START_BURST_VHIST               10                                              /*!< [Expressed in Volts]*/
+#define START_BURST_VHIST               5                                              /*!< [Expressed in Volts]*/
 #define DPC_STARTBURST_EN               SET                                             /*!< [Expressed in Boolean]*/ 
 
 
 ///DPC Run Burst Define of STDES-PFCBIDIR
 #ifdef DPC_VAC_220
-#define DPC_BURST_DUTY_NL               0.1                                            /*!< [Expressed in Unit]*/
+#define DPC_BURST_DUTY_NL               0.15                                            /*!< [Expressed in Unit]*/
 #define DPC_BURST_DUTY_LL               0.25                                            /*!< [Expressed in Unit]*/
 #elif DPC_VAC_110
 #define DPC_BURST_DUTY_NL               0.4                                             /*!< [Expressed in Unit]*/
@@ -120,10 +121,10 @@
 
 
 ///DPC Theshold of STDES-PFCBIDIR
-#define DPC_START_NO_LOAD_CURR          3                                             /*!< [Expressed in AMPs]*/
-#define DPC_START_LOW_LOAD_CURR         4                                              /*!< [Expressed in AMPs]*/
-#define DPC_NO_LOAD_CURR                5                                             /*!< [Expressed in AMPs]*/
-#define DPC_LOW_LOAD_CURR               6                                             /*!< [Expressed in AMPs]*/
+#define DPC_START_NO_LOAD_CURR          20                                             /*!< [Expressed in AMPs x 10]*/
+#define DPC_START_LOW_LOAD_CURR         30                                              /*!< [Expressed in AMPs x 10]*/
+#define DPC_NO_LOAD_CURR                10                                             /*!< [Expressed in AMPs x 10]*/
+#define DPC_LOW_LOAD_CURR               15                                             /*!< [Expressed in AMPs x 10]*/
 #define DPC_OVER_LOAD_CURR              20                                              /*!< [Expressed in AMPs]*/
 #define DPC_NO_LOAD_DELTA_CURR          20                                              /*!< [Expressed in % Percentage]*/
 #define DPC_LOW_LOAD_DELTA_CURR         30                                              /*!< [Expressed in % Percentage]*/
@@ -204,7 +205,7 @@
 #define PLL_KP                          20                                              /*!< PLL - Proportional gain of Phase Loched Loop algorithm*/
 #define PLL_KI                          500//5000                                            /*!< PLL - Integral gain of Phase Loched Loop algorithm*/
 #define PLL_PHI_2pi                     -1.570796                                       /*!< PLL - Constant "-pi/2" [Expressed in rad]*/
-#define PLL_DELTA_F                     5                                              /*!<*/
+#define PLL_DELTA_F                     20                                              /*!<*/
 #define PLL_FF_Hz                       50                                              /*!< PLL - Feed Forward term of the VTO in Phase Loched Loop algorithm [Expressed in Hz]*/
 #define DPC_PLL_SAT_EN                  SET                                             /*!< PLL - Saturation Enable*/ 
 #define DPC_PLL_FGRID                   50                                              /*!< [Expressed in Hz]*/
@@ -236,11 +237,11 @@
 
 
 ///ADC Gain STDES-PFCBIDIR 
-#define G_VAC                           4.708                                           /*!< Gain terms of the AC voltage sensing */
-#define B_VAC                           2048                                            /*!< Bias terms of the AC voltage sensing */
-#define G_IAC                           42.67                                           /*!< Gain terms of the AC current sensing */
-#define B_IAC                           2048                                            /*!< Bias terms of the AC current sensing */
-#define G_VDC                           7.726                                           /*!< Gain terms of the DC voltage sensing */
+#define G_VAC                           4.25//4.708                                           /*!< Gain terms of the AC voltage sensing */
+#define B_VAC                           1975                                            /*!< Bias terms of the AC voltage sensing */
+#define G_IAC                           32.5//42.67                                           /*!< Gain terms of the AC current sensing */
+#define B_IAC                           1958                                          /*!< Bias terms of the AC current sensing */
+#define G_VDC                           7.87//7.726                                           /*!< Gain terms of the DC voltage sensing */
 #define B_VDC                           0                                               /*!< Bias terms of the DC voltage sensing */
 #define G_IDC                           102.4                                           /*!< Gain terms of the DC current sensing */
 #define B_IDC                           2048                                            /*!< Bias terms of the DC current sensing */
@@ -258,7 +259,10 @@
 #define TO_IDLE_Tick                    1000                                           /*!< Timeout Index - TimeOut_IDLE [mills]*/
 
 //Relays delay
-#define RELAY_TIMEOUT 5000
+#define RELAY_TO_CH						1
+#define RELAY_TIMEOUT 					5000
+#define FSM_START_TO_CH					1
+#define FSM_START_TIMEOUT 				5000
 
 /* Exported functions ------------------------------------------------------- */
 
