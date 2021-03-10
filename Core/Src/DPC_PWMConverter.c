@@ -739,25 +739,32 @@ void DPC_PWM_Send_Duty_SPWM(DPC_PWM_TypeDef *tDPC_PWM_loc,float VA,float VB,floa
   uint32_t dutyVCpos;
   uint32_t dutyVCneg;  
   
-  if(VA>=0.0f){VApos=VA;VAneg=0;}else if(VA<0.0f){VApos=0.0f;VAneg=-1*VA;}  
+  if(VA>=0.0f){VApos=VA;VAneg=0;}else if(VA<0.0f){VApos=0.0f;VAneg=-1*VA;}
   if(VB>=0.0f){VBpos=VB;VBneg=0;}else if(VB<0.0f){VBpos=0.0f;VBneg=-1*VB;}
   if(VC>=0.0f){VCpos=VC;VCneg=0;}else if(VC<0.0f){VCpos=0.0f;VCneg=-1*VC;}
-     dutyVAneg=(uint32_t)(VAneg*PWM_PERIOD_COUNTER_INT);
 
-  tDPC_PWM_loc->VApos=VApos;
+  if(VA>=0.0f){VApos=VA;VAneg=0;}else if(VA<0.0f){VApos=-1*VA;VAneg=-1*VA;}
+  if(VB>=0.0f){VBpos=VB;VBneg=0;}else if(VB<0.0f){VBpos=-1*VB;VBneg=-1*VB;}
+  if(VC>=0.0f){VCpos=VC;VCneg=0;}else if(VC<0.0f){VCpos=-1*VC;VCneg=-1*VC;}
+
+
+
+
+  tDPC_PWM_loc->VApos=(float) (1.0f-VApos);
   tDPC_PWM_loc->VBpos=VBpos;
   tDPC_PWM_loc->VCpos=VCpos;
   tDPC_PWM_loc->VAneg=VAneg;
   tDPC_PWM_loc->VBneg=VBneg;
   tDPC_PWM_loc->VCneg=VCneg;
   
-  dutyVApos=(uint32_t)(VApos*PWM_PERIOD_COUNTER_INT);
+  dutyVApos=(uint32_t)(tDPC_PWM_loc->VApos*PWM_PERIOD_COUNTER_INT);
+  dutyVAneg=(uint32_t)(tDPC_PWM_loc->VAneg*PWM_PERIOD_COUNTER_INT);
   
-  dutyVBpos=(uint32_t)(VBpos*PWM_PERIOD_COUNTER_INT);
-  dutyVBneg=(uint32_t)(VBneg*PWM_PERIOD_COUNTER_INT);
+  dutyVBpos=(uint32_t)(tDPC_PWM_loc->VBpos*PWM_PERIOD_COUNTER_INT);
+  dutyVBneg=(uint32_t)(tDPC_PWM_loc->VBneg*PWM_PERIOD_COUNTER_INT);
   
-  dutyVCpos=(uint32_t)(VCpos*PWM_PERIOD_COUNTER_INT);
-  dutyVCneg=(uint32_t)(VCneg*PWM_PERIOD_COUNTER_INT); 
+  dutyVCpos=(uint32_t)(tDPC_PWM_loc->VCpos*PWM_PERIOD_COUNTER_INT);
+  dutyVCneg=(uint32_t)(tDPC_PWM_loc->VCneg*PWM_PERIOD_COUNTER_INT);
   
   if(dutyVApos>=tDPC_PWM_loc->dutyMaxLim){dutyVApos=tDPC_PWM_loc->dutyMaxLim;}
   else if(dutyVApos<tDPC_PWM_loc->dutyMinLim){dutyVApos=tDPC_PWM_loc->dutyMinLim;}
@@ -789,7 +796,7 @@ void DPC_PWM_Send_Duty_SPWM(DPC_PWM_TypeDef *tDPC_PWM_loc,float VA,float VB,floa
   	DMA_SRC->phBB=dutyVBneg;
   	DMA_SRC->phCA=dutyVCpos;
   	DMA_SRC->phCB=dutyVCneg;
-  	DMA_SRC->phA=dutyVApos+dutyVAneg;
+  	DMA_SRC->phA=dutyVApos;
   	DMA_SRC->phB=dutyVBpos+dutyVBneg;
   	DMA_SRC->phC=dutyVCpos+dutyVCneg;
 

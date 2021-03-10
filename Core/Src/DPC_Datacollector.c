@@ -208,6 +208,15 @@ RAW_ADC_UNION* DATA_Read_ADC_Raw(void){
 */
 void DATA_Acquisition_from_DMA(uint32_t* p_ADC1_Data,uint32_t* p_ADC2_Data)                            
 {   
+
+	float temp_IA_f;
+	float temp_IB_f;
+	float temp_IC_f;
+
+	uint32_t temp_IA_u;
+	uint32_t temp_IB_u;
+	uint32_t temp_IC_u;
+
 //#ifdef STDES_VIENNARECT
 //  //AC Side Current
 //  IAC_ADC.phA=p_ADC1_Data[6];             ///Phase A Current AC Sensing
@@ -252,10 +261,36 @@ void DATA_Acquisition_from_DMA(uint32_t* p_ADC1_Data,uint32_t* p_ADC2_Data)
   VAC_ADC.phB=p_ADC1_Data[3];
   VAC_ADC.phC=p_ADC1_Data[4];
   //AC Side Current                           
-  IAC_ADC.phA=p_ADC1_Data[0];
-  IAC_ADC.phB=p_ADC1_Data[1];
+
+  //Simulating Current
+  if (p_ADC1_Data[2]>B_VAC){
+	  temp_IA_u = p_ADC1_Data[2]-B_VAC;
+	  temp_IA_f = ((float)temp_IA_u * 0.3);
+	  IAC_ADC.phA = (uint32_t)temp_IA_f + B_IAC;
+  }
+  else {
+	  temp_IA_u = B_VAC -  p_ADC1_Data[2];
+	  temp_IA_f = ((float)temp_IA_u * 0.2);
+	  IAC_ADC.phA =  B_IAC - (uint32_t)temp_IA_f;
+  }
+
+  if (p_ADC1_Data[3]>B_VAC){
+	  temp_IB_u = p_ADC1_Data[3]-B_VAC;
+	  temp_IB_f = ((float)temp_IB_u * 0.5);
+	  IAC_ADC.phB = (uint32_t)temp_IB_f + B_IAC;
+  }
+  else {
+	  temp_IB_u = B_VAC -  p_ADC1_Data[3];
+	  temp_IB_f = ((float)temp_IB_u * 0.5);
+	  IAC_ADC.phB =  B_IAC - (uint32_t)temp_IB_f;
+  }
 
   IAC_ADC.phC = B_IAC - ((IAC_ADC.phA - B_IAC) + (IAC_ADC.phB - B_IAC));
+
+
+//  IAC_ADC.phA=p_ADC1_Data[0];
+//  IAC_ADC.phB=p_ADC1_Data[1];
+//  IAC_ADC.phC = B_IAC - ((IAC_ADC.phA - B_IAC) + (IAC_ADC.phB - B_IAC));
 
 
   //IAC_ADC.phC=p_ADC1_Data[];

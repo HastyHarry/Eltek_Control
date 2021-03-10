@@ -65,7 +65,7 @@
 
 /* USER CODE BEGIN PV */
 
-float Service_data[20][500];
+float Service_data[20][1000];
 uint16_t Service_step;
 uint16_t Service_counter;
 uint32_t Prev_Saturation;
@@ -281,7 +281,7 @@ int main(void)
 
 
 	  HAL_GPIO_WritePin(PFC_SW_SRC_GPIO_Port, PFC_SW_SRC_Pin, GPIO_PIN_SET);
-	  DPC_FSM_Application();
+	  //DPC_FSM_Application();
 	  //DPC_PWM_OutEnable(&tDPC_PWM);
 	  //HAL_HRTIM_SimplePWMStart(&hhrtim1, &PWM_Tim1, HRTIM_OUTPUT_TA1);
   }
@@ -768,7 +768,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //			HAL_GPIO_WritePin(GPIOA, LED_HL1_Pin, GPIO_PIN_RESET);
 //		}
 //
-		//FSM_Run_State = Run_Idle;
+		PC_State = FSM_Run;
+		FSM_Run_State = Run_PFC_Mode;
 
 		if (PC_State==FSM_Run)                                      ///__________FSM_Run________
 		{
@@ -853,16 +854,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	//Current_DC_Calc(&VOLTAGE_ADC_DC_IN_PHY, &VOLTAGE_ADC_AC_IN_PHY, &CURRENT_ADC_AC_IN_PHY, &CURRENT_ADC_DC_IN_PHY);
 	//end Send QD FRAME data in DATA Layer
 
-	if (Service_step>=500){
+	if (Service_step>=1000){
 		Service_step=0;
+		Service_counter++;
+		if (Service_counter>=10){
+			Service_counter=0;
+		}
 //			if (Flag2==1){
 //				Service_step=0;
 //			}
 	}
 
-		Service_data[0][Service_step]=VOLTAGE_ADC_DC_IN_PHY.Vdc_tot;
-		Service_data[1][Service_step]=CURRENT_ADC_AC_IN_PHY_RMS.phA;
-		Service_data[2][Service_step]=CURRENT_ADC_AC_IN_PHY_RMS.phB;
+		Service_data[0][Service_step]=VOLTAGE_ADC_AC_IN_PHY.phA;
+		Service_data[1][Service_step]=CURRENT_ADC_AC_IN_PHY.phA;
+		Service_data[2][Service_step]=V_ABC_CTRL.axA;
 		Service_data[3][Service_step]=CURRENT_ADC_AC_IN_PHY_RMS.phC;
 		Service_data[4][Service_step]=CURRENT_ADC_AC_IN_PHY.phA;
 		Service_data[5][Service_step]=CURRENT_ADC_AC_IN_PHY.phB;
