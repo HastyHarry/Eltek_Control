@@ -163,4 +163,5 @@ INRUSH_StatusTypeDef DPC_LPCNTRL_Inrush_Check(uint32_t* p_Data_Sub,CurrentAC_ADC
 void DPC_LPCNTRL_Inrush_Init(INRUSH_STRUCT *INRUSH_CTRL_f,uint16_t Vref_hist_VOLT_loc,uint16_t delta_Vref_hist_VOLT_loc,float I_dc_NO_LOAD_Limit_AMP_loc,FlagStatus InrushEnable_loc,DPC_ADC_Conf_TypeDef *DPC_ADC_Conf_loc);
 void DPC_LPCNTRL_PFC_Init(PFC_CTRL_t *pPFC_CTRL_loc,PFC_CTRL_State_TypeDef PFC_CTRL_State,uint16_t PFC_VDC_Ref_loc,DPC_ADC_Conf_TypeDef *DPC_ADC_Conf_loc);
 //void DPC_LPCNTRL_PFC_Init(PFC_CTRL_t *pPFC_CTRL_loc,PFC_CTRL_State_TypeDef PFC_CTRL_State,uint16_t PFC_VDC_Ref_loc,DPC_ADC_Conf_TypeDef *DPC_ADC_Conf_loc);
+void DPC_LPCNTRL_Burst_PID_Mode(uint32_t* p_Data_Sub,BURST_STRUCT *BURST_CTRL_f,CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_NORM_Sub/*uint32_t* iDC_Data_Sub*/,DPC_PWM_TypeDef *tDPC_PWM_loc,DMA_PWMDUTY_STRUCT* DMA_SOURCE );
 #endif /*__DPC_LOOPCTR.H */

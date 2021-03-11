@@ -753,3 +753,78 @@ void DPC_LPCNTRL_PFC_Init(PFC_CTRL_t *pPFC_CTRL_loc,PFC_CTRL_State_TypeDef PFC_C
   pPFC_CTRL_loc->PFC_CTRL_State=PFC_CTRL_State;
 }
 
+/**
+* @brief  DPC_LPCNTRL_Burst_PID_Mode:
+* @param  TBD
+*
+* @retval TBD
+*
+* @note Function valid for STM32G4xx microconroller family
+*/
+void DPC_LPCNTRL_Burst_PID_Mode(uint32_t* p_Data_Sub,BURST_STRUCT *BURST_CTRL_f,CurrentAC_ADC_NORM_Struct* CURRENT_ADC_AC_IN_NORM_Sub/*uint32_t* iDC_Data_Sub*/,DPC_PWM_TypeDef *tDPC_PWM_loc,DMA_PWMDUTY_STRUCT* DMA_SOURCE ){
+
+  uint16_t Vout_load;                                                                   /*!< Local actual DPC output voltage expressed in Bits*/
+  uint16_t Vout_load_max;                                                               /*!< Local histeresis higher ouput DC voltage Thrueshold expressed in Bits */
+  uint16_t Vout_load_min;                                                               /*!< Local histeresis lower ouput DC voltage Thrueshold expressed in Bits */
+  float I_max;
+  float I_min;
+  int16_t I_max_int;
+  int16_t I_min_int;
+  float Burst_Duty;
+  DMA_PWMDUTY_STRUCT* DMA_SOURCE1;
+
+  I_max=0;
+
+
+
+  if (BURST_CTRL_f->Burst_Enable==SET){                                                 /** If Burst_Enable is SET */
+    Vout_load=p_Data_Sub[0]+p_Data_Sub[1];                                              /*!< Pass voltages data in local terms ([0]=VDC_upper  [1]=VDC_lower) */
+    Vout_load_max=BURST_CTRL_f->Vout_max;                                               /*!< Set higher output voltage term*/
+    Vout_load_min=BURST_CTRL_f->Vout_min;                                               /*!< Set lower output voltage term*/
+    BURST_CTRL_f->Vout_load=Vout_load;                                                  /*!< Store output voltage in "BURST_CTRL" struct */
+
+
+  if(BURST_CTRL_f->BURST_Status==BURST_Progress || BURST_CTRL_f->BURST_Status==BURST_Run){
+
+    if(BURST_CTRL_f->Duty_noload>BURST_CTRL_f->Duty_Limit){                              ///Start Check Duty LIMIT
+      BURST_CTRL_f->Duty_noload=BURST_CTRL_f->Duty_Limit;
+    }//End Check Duty_noload LIMIT
+    if(BURST_CTRL_f->Duty_lowload>BURST_CTRL_f->Duty_Limit){                             ///Start Check Duty LIMIT
+      BURST_CTRL_f->Duty_lowload=BURST_CTRL_f->Duty_Limit;
+    }//End Check Duty_lowload LIMIT
+
+
+    if(I_max_int<=(BURST_CTRL_f->Iout_no_load_threshold)){                           ///NO_LOAD  Check
+    Burst_Duty=BURST_CTRL_f->Duty_noload;
+    }
+    else if(I_max_int>(BURST_CTRL_f->Iout_no_load_threshold) || I_max_int<=(BURST_CTRL_f->Iout_low_load_threshold)){                     ///LOW_LOAD  Check
+    Burst_Duty=BURST_CTRL_f->Duty_lowload;
+    }
+
+    DPC_PWM_Send_Burst_PWM(tDPC_PWM_loc,Burst_Duty,Burst_Duty,Burst_Duty,DMA_SOURCE);  /*!< Refresh BURST Duty*/
+    //DMA_SOURCE=DMA_SOURCE1;
+
+//      if (Vout_load>Vout_load_max && BURST_CTRL_f->BURST_PACKAGE==SET)                  /*!< Occured when Vout overcome higher trueshold and BURST_Flag is active*/
+      if (Vout_load>Vout_load_max)                                                      /*!< Occured when Vout overcome higher trueshold and BURST_Flag is active*
+      {
+        DPC_PWM_OutDisable();                                                           /*!< DISABLE BURST PWM*/
+        BURST_CTRL_f->BURST_PACKAGE=RESET;                                              /*!< BURST_Flag become RESET (Burst Inactive)*/
+        BURST_CTRL_f->BURST_IN_RANGE=RESET;                                             /*!< BURST_IN_RANGE_Flag become RESET (Vout higher then limit)*/
+      }
+//      else if (Vout_load<Vout_load_min && BURST_CTRL_f->BURST_PACKAGE==RESET)           /*!< Occured when Vout is lower then low-trueshold and BURST_Flag is stopped*/
+      else if (Vout_load<Vout_load_min)                                                 /*!< Occured when Vout is lower then low-trueshold and BURST_Flag is stopped*/
+      {
+        DPC_PWM_OutEnable(tDPC_PWM_loc);                                               /*!< ENABLE BURST PWM*/
+        BURST_CTRL_f->BURST_PACKAGE=SET;                                                /*!< BURST_Flag become SET (Burst Active)*/
+        BURST_CTRL_f->BURST_IN_RANGE=RESET;                                             /*!< BURST_IN_RANGE_Flag become RESET (Vout lower then limit)*/
+      }
+      else                                                                              /*!< Occured in inner hysteresis window*/
+      {
+        BURST_CTRL_f->BURST_IN_RANGE=SET;
+      }
+  }
+  }
+  BURST_CTRL_f->uI_load_Burst=I_max;
+  BURST_CTRL_f->Burst_Duty=Burst_Duty;
+}
+

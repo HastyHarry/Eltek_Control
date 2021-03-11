@@ -54,8 +54,8 @@ all: main-build
 main-build: Eltek_Control_v.1.2.elf secondary-outputs
 
 # Tool invocations
-Eltek_Control_v.1.2.elf: $(OBJS) $(USER_OBJS) C:\GIT\ Repo\PFC\Eltek_Control_v.1.2\STM32G474RETX_FLASH.ld
-	arm-none-eabi-gcc -o "Eltek_Control_v.1.2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\GIT Repo\PFC\Eltek_Control_v.1.2\STM32G474RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Eltek_Control_v.1.2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Eltek_Control_v.1.2.elf: $(OBJS) $(USER_OBJS) E:\GIT\Eltek_Control\STM32G474RETX_FLASH.ld
+	arm-none-eabi-gcc -o "Eltek_Control_v.1.2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"E:\GIT\Eltek_Control\STM32G474RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Eltek_Control_v.1.2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
